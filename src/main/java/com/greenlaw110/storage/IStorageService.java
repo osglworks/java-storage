@@ -20,6 +20,7 @@
 package com.greenlaw110.storage;
 
 import com.greenlaw110.exception.UnexpectedIOException;
+import com.greenlaw110.util.F;
 
 import java.util.Map;
 
@@ -28,6 +29,8 @@ import java.util.Map;
  * Define A storage service
  */
 public interface IStorageService {
+
+    public static final String CONF_KEY_GEN = "storage.keygen";
 
     /**
      * Configure the service
@@ -68,4 +71,51 @@ public interface IStorageService {
      * @return the URL
      */
     String getUrl(String key);
+    
+    String getKey(String key);
+    
+    public String getKey();
+    
+    public static class f {
+        public static F.F0<Void> put(final String key, final ISObject stuff, final IStorageService ss) {
+            return put().curry(key, stuff, ss);
+        }
+
+        public static F.F3<Void, String, ISObject, IStorageService> put() {
+            return new F.F3<Void, String, ISObject, IStorageService>() {
+                @Override
+                public Void run(String s, ISObject isObject, IStorageService iStorageService) {
+                    iStorageService.put(s, isObject);
+                    return null;
+                }
+            };
+        }
+
+        public static F.F0<ISObject> get(final String key, IStorageService ss) {
+            return get().curry(key, ss);
+        }
+        
+        public static F.F2<ISObject, String, IStorageService> get() {
+            return new F.F2<ISObject, String, IStorageService>() {
+                @Override
+                public ISObject run(String key, IStorageService ss) {
+                    return ss.get(key);
+                }
+            };
+        }
+
+        public static F.F0<Void> remove(final String key, IStorageService ss) {
+            return remove().curry(key, ss);
+        }
+        
+        public static F.F2<Void, String, IStorageService> remove() {
+            return new F.F2<Void, String, IStorageService>() {
+                @Override
+                public Void run(String s, IStorageService ss) {
+                    ss.remove(s);
+                    return null;
+                }
+            };
+        }
+    }
 }

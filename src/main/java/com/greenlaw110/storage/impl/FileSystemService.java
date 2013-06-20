@@ -2,6 +2,7 @@ package com.greenlaw110.storage.impl;
 
 import com.greenlaw110.storage.ISObject;
 import com.greenlaw110.storage.IStorageService;
+import com.greenlaw110.storage.KeyGenerator;
 import com.greenlaw110.util.E;
 import com.greenlaw110.util.IO;
 
@@ -9,25 +10,34 @@ import java.io.*;
 import java.util.Map;
 import java.util.Properties;
 
-public class FileSystemService implements IStorageService {
+public class FileSystemService extends StorageServiceBase implements IStorageService {
+
+    public static final String CONF_HOME_DIR = "storage.fs.home.dir";
+    public static final String CONF_HOME_URL = "storage.fs.home.url";
 
     private File root_ = null;
     private String urlRoot_ = null;
 
     public void configure(Map<String, String> conf) {
+        super.configure(conf);
+        
         if (null == conf) throw new NullPointerException();
 
-        String s = conf.get("storage.file.dir");
+        String s = conf.get(CONF_HOME_DIR);
         root_ = new File(s);
         if (!root_.exists()) {
             root_.mkdir();
         } else if (!root_.isDirectory()) {
-            E.configException("cannot create root dir for file storage");
+            E.invalidConfiguration("cannot create root dir for file storage");
         }
-        urlRoot_ = conf.get("storage.url.root").replace('\\', '/');
+        urlRoot_ = conf.get(CONF_HOME_URL).replace('\\', '/');
         if (!urlRoot_.endsWith("/")) {
             urlRoot_ = urlRoot_ + '/';
         }
+    }
+
+    public FileSystemService(KeyGenerator keygen) {
+        super(keygen);
     }
 
     public FileSystemService(Map<String, String> conf) {
@@ -40,6 +50,11 @@ public class FileSystemService implements IStorageService {
     }
 
     @Override
+    public String getKey(String key) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public ISObject get(String key) {
         key = key.replace('\\', '/');
         String[] path = key.split("/");
@@ -48,7 +63,7 @@ public class FileSystemService implements IStorageService {
         for (int i = 0; i < l; ++i) {
             f = IO.child(f, path[i]);
         }
-        return SObject.asSObject(key, f);
+        return SObject.valueOf(key, f);
     }
 
     @Override
@@ -70,7 +85,6 @@ public class FileSystemService implements IStorageService {
         File fObj = IO.child(f, path[l - 1]);
         OutputStream os = new BufferedOutputStream(IO.os(fObj));
         IO.write(IO.buffered(stuff.asInputStream()), os);
-        IO.write(new BufferedInputStream(stuff.asInputStream()), os);
         
         if (stuff.hasAttribute()) {
             File fAttr = IO.child(f, path[l - 1] + ".attr");
@@ -100,5 +114,4 @@ public class FileSystemService implements IStorageService {
         File fAttr = IO.child(f, path[l - 1] + ".attr");
         IO.delete(fAttr);
     }
-
 }

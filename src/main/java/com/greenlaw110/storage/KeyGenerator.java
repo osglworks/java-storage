@@ -19,99 +19,91 @@
 */
 package com.greenlaw110.storage;
 
+import com.greenlaw110.util.*;
+
 import java.util.Calendar;
 import java.util.UUID;
 
 /**
- * A helper class to generate resource key
+ * Generate or decorate storage object key. There are three types of key generator:
+ * 1. PLAIN, all files are saved directly in one folder
+ * 2. BY_DATE, files are saved in a hierarchical structure like yyyy/MM/dd
+ * 3. BY_DATETIME, files are saved in a hierarchical structure like yyyy/MM/dd/HH/mm/ss
  */
-public class KeyGenerator {
-    
+public enum KeyGenerator {
     /**
-     * Define the storage structure. There are 2 possible structure
-     * 1. PLAIN, all files are saved directly in one folder
-     * 2. BY_DATE, files are saved in a hierarchical structure like yyyy/MM/dd
-     * 3. BY_DATETIME, files are saved in a hierarchical structure like yyyy/MM/dd/HH/mm/ss
-     *
-     * @author greenl
+     * All item stored in the bucket (root folder) without hierarchy
      */
-    public static enum Structure {
-        /**
-         * All item stored in the bucket (root folder) without hierarchy
-         */
-        PLAIN,
-        /**
-         * Items stored in a hierarchy structured by date: /yyyy/MM/dd/item 
-         */
-        BY_DATE, 
-        /**
-         * Items stored in a hierarchy structured by date and time: /yyyy/MM/dd/HH/mm/ss/item 
-         */
-        BY_DATETIME
-    }
-
-    /**
-     * Generate a unique key using {@link Structure#BY_DATE} structure
-     * 
-     * @return a unique
-     */
-    public static String newKey() {
-        return newKey(null, Structure.BY_DATE);
-    }
-
-    /**
-     * Generate a unique key using specified {@link Structure}
-     * 
-     * @param structure
-     * @return a unique key
-     */
-    public static String newKey(Structure structure) {
-        return newKey(null, structure);
-    }
-
-    /**
-     * Generate a key with {@link Structure#BY_DATE} structure
-     * 
-     * @param name
-     * @return
-     */
-    public static String newKey(String name) {
-        return newKey(name, Structure.BY_DATE);
-    }
-
-    /**
-     * Generate a key using user specified name and structure. If name is <code>null</code>
-     * or empty, then a random <code>UUID</code> string is generated with all dash symbol <code>-</code>
-     * removed
-     *
-     * @param name      - the proposed name of the file. optional, if it is null
-     *                  then a random name will be generated
-     * @param structure - the storage structure
-     * @return the key
-     */
-    public static String newKey(String name, Structure structure) {
-        if (null == name || name.trim().equals("")) {
-            name = UUID.randomUUID().toString().replace("-", "");
+    PLAIN {
+        @Override
+        protected String tmpl() {
+            return null;
         }
-
-        if (null == structure) structure = Structure.BY_DATE;
-        switch (structure) {
-            case BY_DATETIME:
-                return String.format("%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS/%2$s", Calendar.getInstance(), name);
-            case BY_DATE:
-                return String.format("%1$tY/%1$tm/%1$td/%2$s", Calendar.getInstance(), name);
-            case PLAIN:
-                return name;
-            default:
-                throw new RuntimeException("oops, how can I get here?");
+    },
+    /**
+     * Items stored in a hierarchy structured by date: /yyyy/MM/dd/item 
+     */
+    BY_DATE {
+        @Override
+        protected String tmpl() {
+            return "%1$tY/%1$tm/%1$td/%2$s";
+        }
+    }, 
+    /**
+     * Items stored in a hierarchy structured by date and time: /yyyy/MM/dd/HH/mm/ss/item 
+     */
+    BY_DATETIME {
+        @Override
+        protected String tmpl() {
+            return "%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS/%2$s";
+        }
+    };
+    
+    protected abstract String tmpl();
+    
+    public String getKey(String name) {
+        if (S.empty(name)) {
+            name = UUID.randomUUID().toString();
+        }
+        String tmpl = tmpl();
+        if (S.empty(tmpl)) {
+            return name;
+        } else {
+            return S.fmt(tmpl, Calendar.getInstance(), name);
         }
     }
     
+    public String getKey() {
+        return getKey(null);
+    }
+
+    public static KeyGenerator valueOfIgnoreCase(String s) {
+        _.NPE(s);
+        if (BY_DATE.name().equalsIgnoreCase(s) || "byDate".equalsIgnoreCase(s) || "date".equalsIgnoreCase(s)) {
+            return BY_DATE;
+        } else if (BY_DATETIME.name().equalsIgnoreCase(s) || "byDateTime".equalsIgnoreCase(s) || "dateTime".equalsIgnoreCase(s)) {
+            return BY_DATETIME;
+        } else if (PLAIN.name().equalsIgnoreCase(s)) {
+            return PLAIN;
+        }
+        throw E.invalidArg("unknown KeyGenerator name: %s", s);
+    }
+
     public static void main(String[] args) {
-        System.out.println(newKey());
-        System.out.println(newKey("Hello.world"));
-        System.out.println(newKey("Hello.world", Structure.BY_DATETIME));
-        System.out.println(newKey(Structure.PLAIN));
-    }
+        ListComprehension lc = C.lc(KeyGenerator.values());
+        
+        lc.map(new F.F1<String, KeyGenerator>(){
+            @Override
+            public String run(KeyGenerator kg) {
+                return kg.toString() + ":" + kg.getKey();
+            }
+        }, IO.f.println()).walkthrough();
 
+        lc.map(new F.F1<String, KeyGenerator>(){
+            @Override
+            public String run(KeyGenerator kg) {
+                return kg.toString() + ":" + kg.getKey("foo.png");
+            }
+        }, IO.f.println()).walkthrough();
+    }
 }

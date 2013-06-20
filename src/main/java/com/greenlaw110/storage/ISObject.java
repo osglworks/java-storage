@@ -23,6 +23,7 @@ import com.greenlaw110.exception.UnexpectedIOException;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -30,7 +31,7 @@ import java.util.Map;
  * 
  * @author greenl
  */
-public interface ISObject {
+public interface ISObject extends Serializable {
 
     /**
      * A standard attribute: content-type
@@ -65,7 +66,7 @@ public interface ISObject {
      * @param key
      * @param val
      */
-    void setAttribute(String key, String val);
+    ISObject setAttribute(String key, String val);
 
     /**
      * @return <code>true</code> if the storage object has attributes
@@ -78,10 +79,27 @@ public interface ISObject {
     Map<String, String> getAttributes();
 
     /**
-     * Save the object along with it's attributes
+     * Is content is empty 
+     * 
+     * @return
      */
-    void save() throws UnexpectedIOException;
-    
+    public boolean isEmpty();
+
+    /**
+     * Is this storage object valid. A storage object is not valid
+     * if the file/input stream is not readable
+     * 
+     * @return
+     */
+    public boolean isValid();
+
+    /**
+     * Return previous exception that cause the sobject invalid 
+     * 
+     * @return
+     */
+    public Throwable getException();
+
    /**
     * @return the the stuff content as an file
     */
@@ -99,9 +117,4 @@ public interface ISObject {
     */
    InputStream asInputStream() throws UnexpectedIOException;
 
-    /**
-     * @return the external URL to access this ISObject. It requires the 
-     * underline storage service supports fetching object via http service. 
-     */
-   String getUrl();
 }

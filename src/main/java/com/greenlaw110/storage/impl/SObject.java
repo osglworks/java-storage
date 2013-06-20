@@ -20,13 +20,12 @@
 package com.greenlaw110.storage.impl;
 
 import com.greenlaw110.storage.ISObject;
-import com.greenlaw110.storage.IStorageService;
-import com.greenlaw110.util.E;
-import com.greenlaw110.util.IO;
-import com.greenlaw110.util.S;
-import com.greenlaw110.util._;
+import com.greenlaw110.util.*;
 
-import java.io.*;
+import javax.activation.MimetypesFileTypeMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,16 +35,24 @@ import java.util.Map;
 public abstract class SObject implements ISObject {
     private String key;
     private Map<String, String> attrs = new HashMap<String, String>();
+    private boolean valid = true;
+    private Throwable cause = null;
     private SObject(String key) {
         if (null == key) {
             throw new NullPointerException();
         }
         this.key = key;
     }
-    private IStorageService service;
+
+    public static SObject getInvalidObject(String key, Throwable cause) {
+        SObject sobj = valueOf(key, "");
+        sobj.valid = false;
+        sobj.cause = cause;
+        return sobj;
+    }
 
     public static ISObject getDumpObject(String key) {
-        return asSObject(key, "");
+        return valueOf(key, "");
     }
     
     public String getKey() {
@@ -58,8 +65,9 @@ public abstract class SObject implements ISObject {
     }
 
     @Override
-    public void setAttribute(String key, String val) {
+    public ISObject setAttribute(String key, String val) {
         attrs.put(key, val);
+        return this;
     }
 
     @Override
@@ -69,32 +77,56 @@ public abstract class SObject implements ISObject {
 
     @Override
     public Map<String, String> getAttributes() {
-        return new HashMap<String, String>(attrs);
+        return C.newMap(attrs);
     }
 
     @Override
-    public void save() {
-        service.put(key, this);
+    public boolean isEmpty() {
+        String s = asString();
+        return null == s || "".equals(s);
     }
 
-    public String getUrl() {
-        return service.getUrl(getKey());
+    @Override
+    public boolean isValid() {
+        return valid;
     }
 
-    public static ISObject asSObject(String key, File f) {
-        return new FileSObject(key, f);
+    @Override
+    public Throwable getException() {
+        return cause;
     }
 
-    public static ISObject asSObject(String key, InputStream is) {
-        return new InputStreamSObject(key, is);
+    public static SObject valueOf(String key, File f) {
+        if (f.canRead() && f.isFile()) {
+            SObject sobj = new ByteArraySObject(key, IO.readContent(f));
+            sobj.setAttribute(ATTR_FILE_NAME, f.getName());
+            sobj.setAttribute(ATTR_CONTENT_TYPE, new MimetypesFileTypeMap().getContentType(f));
+            return sobj;
+        } else {
+            return getInvalidObject(key, new IOException("File is a directory or not readable"));
+        }
     }
 
-    public static ISObject asSObject(String key, String s) {
+    public static SObject valueOf(String key, InputStream is) {
+        try {
+            return new ByteArraySObject(key, IO.readContent(is));
+        } catch (Exception e) {
+            return getInvalidObject(key, e);
+        }
+    }
+
+    public static SObject valueOf(String key, String s) {
         return new StringSObject(key, s);
     }
 
-    public static ISObject asSObject(String key, byte[] buf) {
+    public static SObject valueOf(String key, byte[] buf) {
         return new ByteArraySObject(key, buf);
+    }
+
+    public static SObject valueOf(String key, ISObject copy) {
+        SObject sobj = valueOf(key, copy.asByteArray());
+        sobj.attrs.putAll(copy.getAttributes());
+        return sobj;
     }
     
     private static File createTempFile() {
@@ -105,52 +137,12 @@ public abstract class SObject implements ISObject {
         }
     }
 
-    private static class FileSObject extends SObject {
-        private File f_ = null;
-
-        FileSObject(String key, File f) {
-            super(key);
-            E.NPE(f);
-            if (!f.exists() || !f.canRead() || f.isDirectory()) {
-                E.unexpected("File object[%s] not readable or is a director", f.getPath());
-            }
-            f_ = f;
-        }
-
-        @Override
-        public byte[] asByteArray() {
-            return IO.readContent(f_);
-        }
-
-        @Override
-        public File asFile() {
-            return f_;
-        }
-
-        @Override
-        public InputStream asInputStream() {
-            return IO.is(f_);
-        }
-
-        @Override
-        public String asString() {
-            return IO.readContentAsString(f_);
-        }
-
-        @Override
-        public long getLength() {
-            return f_.length();
-        }
-    }
-
     private static class StringSObject extends SObject {
         private String s_ = null;
 
         StringSObject(String key, String s) {
             super(key);
-            _.NPE(s);
-            
-            s_ = s;
+            s_ = null == s ? "" : s;
         }
 
         @Override
@@ -178,43 +170,6 @@ public abstract class SObject implements ISObject {
         @Override
         public long getLength() {
             return s_.length();
-        }
-    }
-
-    private static class InputStreamSObject extends SObject {
-        private InputStream is_ = null;
-
-        InputStreamSObject(String key, InputStream is) {
-            super(key);
-            _.NPE(is);
-            is_ = is;
-        }
-
-        @Override
-        public byte[] asByteArray() {
-            return IO.readContent(is_);
-        }
-
-        @Override
-        public File asFile() {
-            File tmpFile = createTempFile();
-            IO.write(is_, tmpFile);
-            return tmpFile;
-        }
-
-        @Override
-        public InputStream asInputStream() {
-            return is_;
-        }
-
-        @Override
-        public String asString() {
-            return IO.readContentAsString(is_);
-        }
-
-        @Override
-        public long getLength() {
-            return asByteArray().length;
         }
     }
 
