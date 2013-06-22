@@ -17,10 +17,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package com.greenlaw110.storage.impl;
+package org.osgl.storage.impl;
 
-import com.greenlaw110.storage.ISObject;
-import com.greenlaw110.util.*;
+import org.osgl.storage.ISObject;
+import org.osgl.util.C;
+import org.osgl.util.E;
+import org.osgl.util.IO;
+import org.osgl.util.S;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;

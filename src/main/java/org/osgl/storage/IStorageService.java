@@ -17,10 +17,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package com.greenlaw110.storage;
+package org.osgl.storage;
 
-import com.greenlaw110.exception.UnexpectedIOException;
-import com.greenlaw110.util.F;
+import org.osgl.exception.UnexpectedIOException;
+import org.osgl.util.F;
 
 import java.util.Map;
 

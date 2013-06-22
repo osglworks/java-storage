@@ -1,20 +1,20 @@
-package com.greenlaw110.storage.impl;
+package org.osgl.storage.impl;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
-import com.greenlaw110.storage.ISObject;
-import com.greenlaw110.storage.IStorageService;
-import com.greenlaw110.storage.KeyGenerator;
-import com.greenlaw110.util.E;
-import com.greenlaw110.util.S;
+import org.osgl.storage.ISObject;
+import org.osgl.storage.IStorageService;
+import org.osgl.storage.KeyGenerator;
+import org.osgl.util.E;
+import org.osgl.util.S;
 
 import java.util.Map;
 
 /**
- * Implement {@link IStorageService} on Amazon S3
+ * Implement {@link org.osgl.storage.IStorageService} on Amazon S3
  */
 public class S3Service extends StorageServiceBase implements IStorageService {
 

@@ -17,9 +17,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package com.greenlaw110.storage;
+package org.osgl.storage;
 
-import com.greenlaw110.exception.UnexpectedIOException;
+import org.osgl.exception.UnexpectedIOException;
 
 import java.io.File;
 import java.io.InputStream;

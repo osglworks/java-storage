@@ -1,10 +1,10 @@
-package com.greenlaw110.storage.impl;
+package org.osgl.storage.impl;
 
-import com.greenlaw110.storage.ISObject;
-import com.greenlaw110.storage.IStorageService;
-import com.greenlaw110.storage.KeyGenerator;
-import com.greenlaw110.util.E;
-import com.greenlaw110.util.IO;
+import org.osgl.storage.ISObject;
+import org.osgl.storage.IStorageService;
+import org.osgl.storage.KeyGenerator;
+import org.osgl.util.E;
+import org.osgl.util.IO;
 
 import java.io.*;
 import java.util.Map;

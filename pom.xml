@@ -18,14 +18,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.greenlaw110</groupId>
-    <artifactId>storage</artifactId>
+    <groupId>org.osgl</groupId>
+    <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
-    <url>http://java-storage.greenlaw110.com/</url>
+    <url>http://java-storage.osgl.org/</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -88,8 +88,8 @@
     <dependencies>
     
         <dependency>
-            <groupId>com.greenlaw110</groupId>
-            <artifactId>java-tool</artifactId>
+            <groupId>org.osgl</groupId>
+            <artifactId>osgl-tool</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
     
