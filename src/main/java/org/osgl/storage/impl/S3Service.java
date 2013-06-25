@@ -45,10 +45,15 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     public static final String CONF_STATIC_WEB_ENDPOINT = "storage.s3.staticWebEndpoint";
 
     /**
+     * Get Meta Data only 
+     */
+    public static final String CONF_GET_META_ONLY = "storage.s3.get.MetaOnly";
+
+    /**
      * For certain case for example, gallery application, it doesn't need the GET operation because end 
      * user can access the object directly from aws' static web service 
      */
-    public static final String CONF_GET_META_ONLY = "storage.s3.get.MetaOnly";
+    public static final String CONF_GET_NO_GET = "storage.s3.get.noGet";
 
     public static final String ATTR_STORAGE_CLASS = "x-amz-storage-class";
 
@@ -59,10 +64,11 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     private String bucket;
     private String staticWebEndPoint = null;
     private boolean loadMetaOnly = false;
+    private boolean noGet = false;
     
     
     public static AmazonS3 s3;
-
+    
     public S3Service(KeyGenerator keygen) {
         super(keygen); 
     }
@@ -96,6 +102,10 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         if (conf.containsKey(CONF_GET_META_ONLY)) {
             loadMetaOnly = Boolean.parseBoolean(conf.get(CONF_GET_META_ONLY));
         }
+
+        if (conf.containsKey(CONF_GET_NO_GET)) {
+            noGet = Boolean.parseBoolean(conf.get(CONF_GET_NO_GET));
+        }
     }
 
 //    String authStr(String stringToSign) {
@@ -107,8 +117,11 @@ public class S3Service extends StorageServiceBase implements IStorageService {
 
     @Override
     public ISObject get(String key) {
+        if (noGet) {
+            return SObject.getDumpObject(key);
+        }
         try {
-            ISObject sobj = null;
+            ISObject sobj;
             ObjectMetadata meta;
             if (!loadMetaOnly || S.empty(staticWebEndPoint)) {
                 GetObjectRequest req = new GetObjectRequest(bucket, key);
