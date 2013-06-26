@@ -1,5 +1,6 @@
 package org.osgl.storage.impl;
 
+import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
 import org.osgl.util._;
@@ -35,5 +36,10 @@ public abstract class StorageServiceBase implements IStorageService {
     @Override
     public String getKey() {
         return keygen.getKey();
+    }
+
+    @Override
+    public ISObject forceGet(String key) {
+        return get(key);
     }
 }

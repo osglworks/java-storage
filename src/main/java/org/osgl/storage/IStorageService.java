@@ -48,6 +48,15 @@ public interface IStorageService {
      * @return the file associated with key or null if not found
      */
     ISObject get(String key);
+
+    /**
+     * Force retrieving the stuff from storage without regarding to the configuratoin
+     * 
+     * @param key
+     * @return the storage stuff
+     */
+    ISObject forceGet(String key);
+    
     /**
      * Update the stuff in the storage. If the existing file cannot be find
      * in the storage then it will be added.

@@ -124,15 +124,33 @@ public class S3Service extends StorageServiceBase implements IStorageService {
             ISObject sobj;
             ObjectMetadata meta;
             if (!loadMetaOnly || S.empty(staticWebEndPoint)) {
-                GetObjectRequest req = new GetObjectRequest(bucket, key);
-                S3Object s3obj = s3.getObject(req);
-                sobj = SObject.valueOf(key, s3obj.getObjectContent());
-                meta = s3obj.getObjectMetadata();
+                return forceGet(key);
             } else {
                 GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, key);
                 meta = s3.getObjectMetadata(req);
                 sobj = SObject.getDumpObject(key);
             }
+            
+            Map<String, String> map = meta.getUserMetadata();
+            for (String k : map.keySet()) {
+                sobj.setAttribute(k, map.get(k));
+            }
+            return sobj;
+        } catch (AmazonS3Exception e) {
+            return SObject.getInvalidObject(key, e);
+        }
+    }
+
+    @Override
+    public ISObject forceGet(String key) {
+        try {
+            ISObject sobj;
+            ObjectMetadata meta;
+
+            GetObjectRequest req = new GetObjectRequest(bucket, key);
+            S3Object s3obj = s3.getObject(req);
+            sobj = SObject.valueOf(key, s3obj.getObjectContent());
+            meta = s3obj.getObjectMetadata();
             
             Map<String, String> map = meta.getUserMetadata();
             for (String k : map.keySet()) {
