@@ -5,6 +5,7 @@ import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
 import org.osgl.util.E;
 import org.osgl.util.IO;
+import org.osgl.util.S;
 
 import java.io.*;
 import java.util.Map;
@@ -59,11 +60,26 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         key = key.replace('\\', '/');
         String[] path = key.split("/");
         int l = path.length;
-        File f = root_;
+        File f = root_, fa = null;
         for (int i = 0; i < l; ++i) {
             f = IO.child(f, path[i]);
+            fa = IO.child(f.getParentFile(), path[i] + ".attr");
         }
-        return SObject.valueOf(key, f);
+        ISObject obj = SObject.valueOf(key, f);
+        if (fa.exists()) {
+            try {
+                Properties p = new Properties();
+                InputStream is = IO.buffered(IO.is(fa));
+                p.load(is);
+                is.close();
+                for (Object o : p.keySet()) {
+                    obj.setAttribute(o.toString(), S.string(p.get(o)));
+                }
+            } catch (IOException e) {
+                E.ioException(e);
+            }
+        }
+        return obj;
     }
 
     @Override
