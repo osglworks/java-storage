@@ -3,7 +3,7 @@ package org.osgl.storage.impl;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
-import org.osgl.util._;
+import org.osgl.util.E;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public abstract class StorageServiceBase implements IStorageService {
         keygen = KeyGenerator.BY_DATE;
     }
     protected StorageServiceBase(KeyGenerator keygen) {
-        _.NPE(keygen);
+        E.NPE(keygen);
         this.keygen = keygen;
     }
 

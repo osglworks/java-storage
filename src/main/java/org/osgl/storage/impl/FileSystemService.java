@@ -31,7 +31,9 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         } else if (!root_.isDirectory()) {
             E.invalidConfiguration("cannot create root dir for file storage");
         }
-        urlRoot_ = conf.get(CONF_HOME_URL).replace('\\', '/');
+        urlRoot_ = conf.get(CONF_HOME_URL);
+        if (null == urlRoot_) return;
+        urlRoot_ = urlRoot_.replace('\\', '/');
         if (!urlRoot_.endsWith("/")) {
             urlRoot_ = urlRoot_ + '/';
         }
@@ -47,12 +49,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
 
     @Override
     public String getUrl(String key) {
-        return urlRoot_ + key;
-    }
-
-    @Override
-    public String getKey(String key) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null == urlRoot_ ? null : urlRoot_ + key;
     }
 
     @Override

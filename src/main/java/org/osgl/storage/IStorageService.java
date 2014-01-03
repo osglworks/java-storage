@@ -19,8 +19,8 @@
 */
 package org.osgl.storage;
 
+import org.osgl._;
 import org.osgl.exception.UnexpectedIOException;
-import org.osgl.util.F;
 
 import java.util.Map;
 
@@ -86,41 +86,41 @@ public interface IStorageService {
     public String getKey();
     
     public static class f {
-        public static F.F0<Void> put(final String key, final ISObject stuff, final IStorageService ss) {
+        public static _.F0<Void> put(final String key, final ISObject stuff, final IStorageService ss) {
             return put().curry(key, stuff, ss);
         }
 
-        public static F.F3<Void, String, ISObject, IStorageService> put() {
-            return new F.F3<Void, String, ISObject, IStorageService>() {
+        public static _.F3<String, ISObject, IStorageService, Void> put() {
+            return new _.F3<String, ISObject, IStorageService, Void>() {
                 @Override
-                public Void run(String s, ISObject isObject, IStorageService iStorageService) {
+                public Void apply(String s, ISObject isObject, IStorageService iStorageService) {
                     iStorageService.put(s, isObject);
                     return null;
                 }
             };
         }
 
-        public static F.F0<ISObject> get(final String key, IStorageService ss) {
+        public static _.F0<ISObject> get(final String key, IStorageService ss) {
             return get().curry(key, ss);
         }
         
-        public static F.F2<ISObject, String, IStorageService> get() {
-            return new F.F2<ISObject, String, IStorageService>() {
+        public static _.F2<String, IStorageService, ISObject> get() {
+            return new _.F2<String, IStorageService, ISObject>() {
                 @Override
-                public ISObject run(String key, IStorageService ss) {
+                public ISObject apply(String key, IStorageService ss) {
                     return ss.get(key);
                 }
             };
         }
 
-        public static F.F0<Void> remove(final String key, IStorageService ss) {
+        public static _.F0<Void> remove(final String key, IStorageService ss) {
             return remove().curry(key, ss);
         }
         
-        public static F.F2<Void, String, IStorageService> remove() {
-            return new F.F2<Void, String, IStorageService>() {
+        public static _.F2<String, IStorageService, Void> remove() {
+            return new _.F2<String, IStorageService, Void>() {
                 @Override
-                public Void run(String s, IStorageService ss) {
+                public Void apply(String s, IStorageService ss) {
                     ss.remove(s);
                     return null;
                 }

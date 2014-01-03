@@ -203,7 +203,7 @@ public abstract class SObject implements ISObject {
 
         @Override
         public String asString() {
-            return S.str(buf_);
+            return S.string(buf_);
         }
 
         @Override

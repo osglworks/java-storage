@@ -19,7 +19,8 @@
 */
 package org.osgl.storage;
 
-import org.osgl.util.*;
+import org.osgl.util.E;
+import org.osgl.util.S;
 
 import java.util.Calendar;
 import java.util.UUID;
@@ -78,7 +79,7 @@ public enum KeyGenerator {
     }
 
     public static KeyGenerator valueOfIgnoreCase(String s) {
-        _.NPE(s);
+        E.NPE(s);
         if (BY_DATE.name().equalsIgnoreCase(s) || "byDate".equalsIgnoreCase(s) || "date".equalsIgnoreCase(s)) {
             return BY_DATE;
         } else if (BY_DATETIME.name().equalsIgnoreCase(s) || "byDateTime".equalsIgnoreCase(s) || "dateTime".equalsIgnoreCase(s)) {
@@ -89,21 +90,4 @@ public enum KeyGenerator {
         throw E.invalidArg("unknown KeyGenerator name: %s", s);
     }
 
-    public static void main(String[] args) {
-        ListComprehension lc = C.lc(KeyGenerator.values());
-        
-        lc.map(new F.F1<String, KeyGenerator>(){
-            @Override
-            public String run(KeyGenerator kg) {
-                return kg.toString() + ":" + kg.getKey();
-            }
-        }, IO.f.println()).walkthrough();
-
-        lc.map(new F.F1<String, KeyGenerator>(){
-            @Override
-            public String run(KeyGenerator kg) {
-                return kg.toString() + ":" + kg.getKey("foo.png");
-            }
-        }, IO.f.println()).walkthrough();
-    }
 }
