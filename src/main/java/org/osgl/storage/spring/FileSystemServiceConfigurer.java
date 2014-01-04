@@ -4,8 +4,10 @@ import org.osgl.storage.IStorageService;
 import org.osgl.storage.impl.FileSystemService;
 import org.osgl.util.C;
 import org.osgl.util.E;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -17,9 +19,9 @@ public class FileSystemServiceConfigurer extends StorageServiceConfigurerBase im
     private String homeDir;
     private String homeUrl;
 
-    public void setHomeDir(String homeDir) {
+    public void setHomeDir(Resource homeDir) throws IOException {
         E.NPE(homeDir);
-        this.homeDir = homeDir;
+        this.homeDir = homeDir.getFile().getAbsolutePath();
     }
 
     public void setHomeUrl(String homeUrl) {

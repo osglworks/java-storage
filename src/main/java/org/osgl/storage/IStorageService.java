@@ -50,12 +50,44 @@ public interface IStorageService {
     ISObject get(String key);
 
     /**
-     * Force retrieving the stuff from storage without regarding to the configuratoin
+     * Returns lazy SObject with attributes set. This method is useful when user
+     * application choose to store attributes and key of SObject into database, and
+     * lazy load SObject content later one by calling {@link #loadContent(ISObject)}
+     *
+     * @param key
+     * @param attrs
+     * @return a sobject with meta attributes and key only. content of the sobject is not loaded
+     */
+    ISObject getLazy(String key, Map<String, String> attrs);
+
+    /**
+     * Force retrieving the stuff with content from storage without regarding to the configuration
      * 
      * @param key
      * @return the storage stuff
+     * @deprecated
+     * @see #getFull(String)
      */
     ISObject forceGet(String key);
+
+    /**
+     * Force retrieving the stuff with content from storage without regarding to the configuration
+     *
+     * @param key
+     * @return the storage stuff
+     * @see #loadContent(ISObject)
+     */
+    ISObject getFull(String key);
+
+
+    /**
+     * Load content of an sobject. If the content is already loaded, then the object should
+     * be returned directly
+     *
+     * @param sobj
+     * @return the sobject with content presented
+     */
+    ISObject loadContent(ISObject sobj);
     
     /**
      * Update the stuff in the storage. If the existing file cannot be find

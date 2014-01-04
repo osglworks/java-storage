@@ -19,6 +19,7 @@
 */
 package org.osgl.storage;
 
+import org.osgl._;
 import org.osgl.exception.UnexpectedIOException;
 
 import java.io.File;
@@ -69,6 +70,13 @@ public interface ISObject extends Serializable {
     ISObject setAttribute(String key, String val);
 
     /**
+     * Set attributes to the storage object
+     * @param attrs
+     * @return the object with attributes set
+     */
+    ISObject setAttributes(Map<String, String> attrs);
+
+    /**
      * @return <code>true</code> if the storage object has attributes
      */
     boolean hasAttribute();
@@ -116,5 +124,11 @@ public interface ISObject extends Serializable {
     * @return the stuff content as an input stream
     */
    InputStream asInputStream() throws UnexpectedIOException;
+
+    /**
+     * Consume the inputstream of this storage object one time and then close the input stream
+     * @param consumer the consumer function
+     */
+   void consumeOnce(_.Function<InputStream, ?> consumer) throws UnexpectedIOException;
 
 }

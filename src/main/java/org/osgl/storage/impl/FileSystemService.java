@@ -15,9 +15,13 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
 
     public static final String CONF_HOME_DIR = "storage.fs.home.dir";
     public static final String CONF_HOME_URL = "storage.fs.home.url";
+    public static final String CONF_LAZY_LOAD = "storage.fs.lazy";
+    public static final String CONF_GET_NO_GET = "storage.fs.get.noGet";
 
     private File root_ = null;
     private String urlRoot_ = null;
+    private boolean lazyLoad_ = false;
+    private boolean noGet_ = false;
 
     public void configure(Map<String, String> conf) {
         super.configure(conf);
@@ -37,6 +41,16 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         if (!urlRoot_.endsWith("/")) {
             urlRoot_ = urlRoot_ + '/';
         }
+
+        Object o = conf.get(CONF_LAZY_LOAD);
+        if (null != o) {
+            lazyLoad_ = Boolean.parseBoolean(o.toString());
+        }
+
+        o = conf.get(CONF_GET_NO_GET);
+        if (null != o) {
+            noGet_ = Boolean.parseBoolean(o.toString());
+        }
     }
 
     public FileSystemService(KeyGenerator keygen) {
@@ -54,6 +68,9 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
 
     @Override
     public ISObject get(String key) {
+        if (noGet_) {
+            return SObject.getDumpObject(key);
+        }
         key = key.replace('\\', '/');
         String[] path = key.split("/");
         int l = path.length;
@@ -77,6 +94,22 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             }
         }
         return obj;
+    }
+
+    @Override
+    public ISObject loadContent(ISObject sobj) {
+        String key = sobj.getKey();
+        key = key.replace('\\', '/');
+        String[] path = key.split("/");
+        int l = path.length;
+        File f = root_;
+        for (int i = 0; i < l; ++i) {
+            f = IO.child(f, path[i]);
+        }
+        Map<String, String> attrs = sobj.getAttributes();
+        sobj = SObject.valueOf(key, f);
+        sobj.setAttributes(attrs);
+        return sobj;
     }
 
     @Override

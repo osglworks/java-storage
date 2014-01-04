@@ -39,7 +39,20 @@ public abstract class StorageServiceBase implements IStorageService {
     }
 
     @Override
-    public ISObject forceGet(String key) {
+    public final ISObject forceGet(String key) {
+        return getFull(key);
+    }
+
+    @Override
+    public ISObject getFull(String key) {
         return get(key);
     }
+
+    @Override
+    public ISObject getLazy(String key, Map<String, String> attrs) {
+        SObject sobj = SObject.lazyLoad(key, this);
+        sobj.setAttributes(attrs);
+        return sobj;
+    }
+
 }

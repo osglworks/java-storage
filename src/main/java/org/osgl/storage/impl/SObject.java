@@ -19,7 +19,10 @@
 */
 package org.osgl.storage.impl;
 
+import org.osgl._;
+import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
+import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
 import org.osgl.util.E;
 import org.osgl.util.IO;
@@ -40,7 +43,7 @@ public abstract class SObject implements ISObject {
     private Map<String, String> attrs = new HashMap<String, String>();
     private boolean valid = true;
     private Throwable cause = null;
-    private SObject(String key) {
+    SObject(String key) {
         if (null == key) {
             throw new NullPointerException();
         }
@@ -57,9 +60,20 @@ public abstract class SObject implements ISObject {
     public static ISObject getDumpObject(String key) {
         return valueOf(key, "");
     }
+
+    public static ISObject getDumpObject(String key, Map<String, String> attrs) {
+        SObject sobj = valueOf(key, "");
+        sobj.setAttrs(attrs);
+        return sobj;
+    }
     
     public String getKey() {
         return key;
+    }
+
+    protected void setAttrs(Map<String, String> attrs) {
+        if (null == attrs) return;
+        this.attrs.putAll(attrs);
     }
 
     @Override
@@ -70,6 +84,12 @@ public abstract class SObject implements ISObject {
     @Override
     public ISObject setAttribute(String key, String val) {
         attrs.put(key, val);
+        return this;
+    }
+
+    @Override
+    public ISObject setAttributes(Map<String, String> attrs) {
+        setAttrs(attrs);
         return this;
     }
 
@@ -99,15 +119,39 @@ public abstract class SObject implements ISObject {
         return cause;
     }
 
+    @Override
+    public void consumeOnce(_.Function<InputStream, ?> consumer) {
+        InputStream is = null;
+        try {
+            is = asInputStream();
+            consumer.apply(is);
+        } finally {
+            IO.close(is);
+        }
+    }
+
     public static SObject valueOf(String key, File f) {
         if (f.canRead() && f.isFile()) {
-            SObject sobj = new ByteArraySObject(key, IO.readContent(f));
+            SObject sobj = new FileSObject(key, f);
             sobj.setAttribute(ATTR_FILE_NAME, f.getName());
             sobj.setAttribute(ATTR_CONTENT_TYPE, new MimetypesFileTypeMap().getContentType(f));
             return sobj;
         } else {
             return getInvalidObject(key, new IOException("File is a directory or not readable"));
         }
+    }
+
+    public static SObject valueOf(String key, File file, Map<String, String> conf) {
+        SObject sobj = valueOf(key, file);
+        sobj.setAttributes(conf);
+        return sobj;
+    }
+
+    public static SObject valueOf(String key, File file, String ... attrs) {
+        SObject sobj = valueOf(key, file);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
+        return sobj;
     }
 
     public static SObject valueOf(String key, InputStream is) {
@@ -118,20 +162,77 @@ public abstract class SObject implements ISObject {
         }
     }
 
+    public static SObject valueOf(String key, InputStream is, Map<String, String> conf) {
+        SObject sobj = valueOf(key, is);
+        sobj.setAttributes(conf);
+        return sobj;
+    }
+
+    public static SObject valueOf(String key, InputStream is, String ... attrs) {
+        SObject sobj = valueOf(key, is);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
+        return sobj;
+    }
+
     public static SObject valueOf(String key, String s) {
         return new StringSObject(key, s);
+    }
+
+
+    public static SObject valueOf(String key, String s, Map<String, String> conf) {
+        SObject sobj = valueOf(key, s);
+        sobj.setAttributes(conf);
+        return sobj;
+    }
+
+    public static SObject valueOf(String key, String s, String ... attrs) {
+        SObject sobj = valueOf(key, s);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
+        return sobj;
     }
 
     public static SObject valueOf(String key, byte[] buf) {
         return new ByteArraySObject(key, buf);
     }
 
-    public static SObject valueOf(String key, ISObject copy) {
-        SObject sobj = valueOf(key, copy.asByteArray());
-        sobj.attrs.putAll(copy.getAttributes());
+    public static SObject valueOf(String key, byte[] buf, Map<String, String> conf) {
+        SObject sobj = valueOf(key, buf);
+        sobj.setAttributes(conf);
         return sobj;
     }
+
+    public static SObject valueOf(String key, byte[] buf, String ... attrs) {
+        SObject sobj = valueOf(key, buf);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
+        return sobj;
+    }
+
+    public static SObject valueOf(String key, ISObject copy) {
+        SObject sobj = valueOf(key, copy.asByteArray());
+        sobj.setAttrs(copy.getAttributes());
+        return sobj;
+    }
+
+    public static SObject lazyLoad(String key, IStorageService ss) {
+        return new LazyLoadSObject(key, ss);
+    }
     
+    public static SObject lazyLoad(String key, IStorageService ss, Map<String, String> conf) {
+        SObject sobj = lazyLoad(key, ss);
+        sobj.setAttributes(conf);
+        return sobj;
+    }
+
+    public static SObject lazyLoad(String key, IStorageService ss, String ... attrs) {
+        SObject sobj = lazyLoad(key, ss);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
+        return sobj;
+    }
+
     private static File createTempFile() {
         try {
             return File.createTempFile("sobj_", ".tmp");
@@ -176,11 +277,56 @@ public abstract class SObject implements ISObject {
         }
     }
 
+    private static class FileSObject extends SObject {
+        private File file_;
+        private byte[] ba_;
+
+        FileSObject(String key, File file) {
+            super(key);
+            E.NPE(file);
+            file_ = file;
+        }
+
+        private void readToCache() {
+            if (null != ba_) return;
+            ba_ = IO.readContent(file_);
+        }
+
+        @Override
+        public long getLength() {
+            return file_.length();
+        }
+
+        @Override
+        public File asFile() throws UnexpectedIOException {
+            return file_;
+        }
+
+        @Override
+        public String asString() throws UnexpectedIOException {
+            readToCache();
+            return S.string(ba_);
+        }
+
+        @Override
+        public byte[] asByteArray() throws UnexpectedIOException {
+            readToCache();
+            return ba_;
+        }
+
+        @Override
+        public InputStream asInputStream() throws UnexpectedIOException {
+            return IO.is(file_);
+        }
+
+    }
+
     private static class ByteArraySObject extends SObject {
         private byte[] buf_;
 
         ByteArraySObject(String key, byte[] buf) {
             super(key);
+            E.NPE(buf);
             buf_ = buf;
         }
         
@@ -211,5 +357,50 @@ public abstract class SObject implements ISObject {
             return buf_.length;
         }
     }
-    
+
+    private static class LazyLoadSObject extends SObject {
+        private volatile ISObject sobj_;
+        private IStorageService ss_;
+
+        LazyLoadSObject(String key, IStorageService ss) {
+            super(key);
+            E.NPE(ss);
+            ss_ = ss;
+        }
+
+        private ISObject force() {
+            if (null == sobj_) {
+                synchronized (this) {
+                    if (null == sobj_) sobj_ = ss_.get(getKey());
+                }
+            }
+            return sobj_;
+        }
+
+        @Override
+        public long getLength() {
+            return null == sobj_ ? -1 : sobj_.getLength();
+        }
+
+        @Override
+        public File asFile() throws UnexpectedIOException {
+            return force().asFile();
+        }
+
+        @Override
+        public String asString() throws UnexpectedIOException {
+            return force().asString();
+        }
+
+        @Override
+        public byte[] asByteArray() throws UnexpectedIOException {
+            return force().asByteArray();
+        }
+
+        @Override
+        public InputStream asInputStream() throws UnexpectedIOException {
+            return force().asInputStream();
+        }
+    }
+
 }

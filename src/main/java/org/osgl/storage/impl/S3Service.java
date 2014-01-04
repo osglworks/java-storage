@@ -142,7 +142,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     }
 
     @Override
-    public ISObject forceGet(String key) {
+    public ISObject getFull(String key) {
         try {
             ISObject sobj;
             ObjectMetadata meta;
@@ -156,6 +156,24 @@ public class S3Service extends StorageServiceBase implements IStorageService {
             for (String k : map.keySet()) {
                 sobj.setAttribute(k, map.get(k));
             }
+            return sobj;
+        } catch (AmazonS3Exception e) {
+            return SObject.getInvalidObject(key, e);
+        }
+    }
+
+    @Override
+    public ISObject loadContent(ISObject sobj0) {
+        String key = sobj0.getKey();
+        try {
+            ISObject sobj;
+
+            GetObjectRequest req = new GetObjectRequest(bucket, key);
+            S3Object s3obj = s3.getObject(req);
+            sobj = SObject.valueOf(key, s3obj.getObjectContent());
+
+            Map<String, String> attrs = sobj0.getAttributes();
+            sobj.setAttributes(attrs);
             return sobj;
         } catch (AmazonS3Exception e) {
             return SObject.getInvalidObject(key, e);
