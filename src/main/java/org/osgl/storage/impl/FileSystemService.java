@@ -51,6 +51,8 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         if (null != o) {
             noGet_ = Boolean.parseBoolean(o.toString());
         }
+
+        logger.debug("FileSystemService configured. home: %s, url root: %s", root_, urlRoot_);
     }
 
     public FileSystemService(KeyGenerator keygen) {

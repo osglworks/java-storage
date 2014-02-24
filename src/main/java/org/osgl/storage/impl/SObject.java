@@ -275,6 +275,7 @@ public abstract class SObject implements ISObject {
         public long getLength() {
             return s_.length();
         }
+
     }
 
     private static class FileSObject extends SObject {

@@ -1,5 +1,7 @@
 package org.osgl.storage.impl;
 
+import org.osgl.logging.L;
+import org.osgl.logging.Logger;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
@@ -11,6 +13,9 @@ import java.util.Map;
  * The implementation base of {@link IStorageService} 
  */
 public abstract class StorageServiceBase implements IStorageService {
+
+    protected static Logger logger = L.get(StorageServiceBase.class);
+
     protected KeyGenerator keygen;
     protected StorageServiceBase(){
         keygen = KeyGenerator.BY_DATE;
