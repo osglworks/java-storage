@@ -25,6 +25,7 @@ import org.osgl.exception.UnexpectedIOException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -116,6 +117,10 @@ public interface ISObject extends Serializable {
     * @return the stuff content as a string
     */
    String asString() throws UnexpectedIOException;
+    /**
+     * @return the stuff content as a string using the charset to encode
+     */
+   String asString(Charset charset) throws UnexpectedIOException;
    /**
     * @return the stuff content as a byte array
     */

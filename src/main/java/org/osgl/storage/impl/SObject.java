@@ -19,6 +19,7 @@
 */
 package org.osgl.storage.impl;
 
+import org.apache.commons.codec.Charsets;
 import org.osgl._;
 import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
@@ -26,12 +27,12 @@ import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
 import org.osgl.util.E;
 import org.osgl.util.IO;
-import org.osgl.util.S;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -272,6 +273,11 @@ public abstract class SObject implements ISObject {
         }
 
         @Override
+        public String asString(Charset charset) throws UnexpectedIOException {
+            return s_;
+        }
+
+        @Override
         public long getLength() {
             return s_.length();
         }
@@ -305,8 +311,13 @@ public abstract class SObject implements ISObject {
 
         @Override
         public String asString() throws UnexpectedIOException {
+            return asString(Charsets.UTF_8);
+        }
+
+        @Override
+        public String asString(Charset charset) throws UnexpectedIOException {
             readToCache();
-            return S.string(ba_);
+            return new String(ba_, charset);
         }
 
         @Override
@@ -350,7 +361,12 @@ public abstract class SObject implements ISObject {
 
         @Override
         public String asString() {
-            return new String(buf_);
+            return asString(Charsets.UTF_8);
+        }
+
+        @Override
+        public String asString(Charset charset) throws UnexpectedIOException {
+            return new String(buf_, charset);
         }
 
         @Override
@@ -391,6 +407,11 @@ public abstract class SObject implements ISObject {
         @Override
         public String asString() throws UnexpectedIOException {
             return force().asString();
+        }
+
+        @Override
+        public String asString(Charset charset) throws UnexpectedIOException {
+            return force().asString(charset);
         }
 
         @Override
