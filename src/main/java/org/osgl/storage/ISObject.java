@@ -117,6 +117,7 @@ public interface ISObject extends Serializable {
     * @return the stuff content as a string
     */
    String asString() throws UnexpectedIOException;
+
     /**
      * @return the stuff content as a string using the charset to encode
      */

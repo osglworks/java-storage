@@ -27,6 +27,7 @@ import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
 import org.osgl.util.E;
 import org.osgl.util.IO;
+import org.osgl.util.S;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
@@ -131,84 +132,318 @@ public abstract class SObject implements ISObject {
         }
     }
 
-    public static SObject valueOf(String key, File f) {
-        if (f.canRead() && f.isFile()) {
-            SObject sobj = new FileSObject(key, f);
-            sobj.setAttribute(ATTR_FILE_NAME, f.getName());
-            sobj.setAttribute(ATTR_CONTENT_TYPE, new MimetypesFileTypeMap().getContentType(f));
+    /**
+     * Construct an SObject with file specified. The key to the
+     * sobject is the file's path
+     * @param file
+     * @return an SObject
+     */
+    public static SObject of(File file) {
+        return of(file.getPath(), file);
+    }
+
+    /**
+     * Construct an SObject with key and file specified
+     * @see #of(String, java.io.File, java.util.Map)
+     */
+    public static SObject of(String key, File file) {
+        if (file.canRead() && file.isFile()) {
+            SObject sobj = new FileSObject(key, file);
+            sobj.setAttribute(ATTR_FILE_NAME, file.getName());
+            sobj.setAttribute(ATTR_CONTENT_TYPE, new MimetypesFileTypeMap().getContentType(file));
             return sobj;
         } else {
             return getInvalidObject(key, new IOException("File is a directory or not readable"));
         }
     }
 
-    public static SObject valueOf(String key, File file, Map<String, String> conf) {
-        SObject sobj = valueOf(key, file);
-        sobj.setAttributes(conf);
+    /**
+     * Deprecated
+     * @see #of(String, java.io.File)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, File f) {
+        return of(key, f);
+    }
+
+    /**
+     * Construct an SObject with specified key, file and attributes
+     * specified in {@link java.util.Map}
+     * @see #of(String, java.io.File, String...)
+     */
+    public static SObject of(String key, File file, Map<String, String> attributes) {
+        SObject sobj = of(key, file);
+        sobj.setAttributes(attributes);
         return sobj;
     }
 
-    public static SObject valueOf(String key, File file, String ... attrs) {
-        SObject sobj = valueOf(key, file);
+    /**
+     * @see #of(String, java.io.File, java.util.Map)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, File file, Map<String, String> conf) {
+        return of(key, file, conf);
+    }
+
+    /**
+     * Construct an SObject with key, file and attributes specified in
+     * key1, val1, key2, val2... sequence
+     * @see #of(String, java.io.File, java.util.Map)
+     */
+    public static SObject of(String key, File file, String ... attrs) {
+        SObject sobj = of(key, file);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
     }
 
-    public static SObject valueOf(String key, InputStream is) {
+    /**
+     * Deprecated
+     * @see #of(String, java.io.File, String...)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, File file, String ... attrs) {
+        return of(key, file, attrs);
+    }
+
+    /**
+     * Construct an sobject with specified input stream and a randomly
+     * generated key.
+     *
+     * <p>Node the sobject constrcuted from input stream has limits
+     * please see the comment to {@link #of(String, java.io.InputStream)}
+     * </p>
+     *
+     * @see #of(String, java.io.InputStream)
+     */
+    public static SObject of(InputStream is) {
+        return of(S.random(), is);
+    }
+
+    /**
+     * Construct an SObject with key and input stream. Note unlike sobject
+     * constructed with String, byte array or file, the sobject constructed
+     * with input stream can only be read for one time. If the program
+     * tries to access the Sobject the second time, it will encountered an
+     * {@link UnexpectedIOException}. Another limit of this sobject is it
+     * does not support {@link org.osgl.storage.ISObject#getLength()} method
+     *
+     * <p>If it needs to construct an SObject without these limits from
+     * an input stream, then it shall first read the inputstream into
+     * a bytearray, and use the byte array to construct the sobject like
+     * following code</p>
+     *
+     * <pre><code>
+     * InputStream is = ...
+     * ...
+     * ISObject sobj = SObject.of(IO.readContent(is))
+     * </code><pre>
+     */
+    public static SObject of(String key, InputStream is) {
         try {
-            return new ByteArraySObject(key, IO.readContent(is));
+            return new InputStreamSObject(key, is);
         } catch (Exception e) {
             return getInvalidObject(key, e);
         }
     }
 
+    /**
+     * deprecated
+     * @see #of(String, java.io.InputStream)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, InputStream is) {
+        return of(key, is);
+    }
+
+    /**
+     * Construct a sobject with key, input stream and attributes specified in a
+     * {@link java.util.Map}.
+     *
+     * <p>Node the sobject constrcuted from input stream has limits
+     * please see the comment to {@link #of(String, java.io.InputStream)}
+     * </p>
+     *
+     * @see #of(String, java.io.InputStream)
+     */
+    public static SObject of(String key, InputStream is, Map<String, String> conf) {
+        SObject sobj = of(key, is);
+        sobj.setAttributes(conf);
+        return sobj;
+    }
+
+    /**
+     * deprecated
+     * @see #of(String, java.io.InputStream, java.util.Map)
+     */
+    @Deprecated
     public static SObject valueOf(String key, InputStream is, Map<String, String> conf) {
-        SObject sobj = valueOf(key, is);
-        sobj.setAttributes(conf);
+        return of(key, is, conf);
+    }
+
+    /**
+     * Construct a sobject with key, input stream and attributes specified in a
+     * sequence like key1, val1, key2, val2, ...
+     *
+     * <p>Node the sobject constrcuted from input stream has limits
+     * please see the comment to {@link #of(String, java.io.InputStream)}
+     * </p>
+     *
+     * @see #of(String, java.io.InputStream)
+     */
+    public static SObject of(String key, InputStream is, String ... attrs) {
+        SObject sobj = of(key, is);
+        Map<String, String> map = C.map(attrs);
+        sobj.setAttributes(map);
         return sobj;
     }
 
+    /**
+     * deprecated
+     * @see #of(String, java.io.File, String...)
+     */
+    @Deprecated
     public static SObject valueOf(String key, InputStream is, String ... attrs) {
-        SObject sobj = valueOf(key, is);
+        return of(key, is, attrs);
+    }
+
+    /**
+     * Construct an sobject with specified content in String and a randomly
+     * generated key
+     *
+     * @see #of(String, String)
+     */
+    public static SObject of(String content) {
+        return new StringSObject(S.random(), content);
+    }
+
+    /**
+     * Construct an sobject with content and key specified
+     *
+     * @see #of(String, String, Map)
+     */
+    public static SObject of(String key, String content) {
+        return new StringSObject(key, content);
+    }
+
+    /**
+     * Deprecated
+     * @see #of(String, String)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, String content) {
+        return of(key, content);
+    }
+
+    /**
+     * Construct an sobject with content, key and attributes specified in
+     * {@link java.util.Map}
+     */
+    public static SObject of(String key, String content, Map<String, String> attrs) {
+        SObject sobj = of(key, content);
+        sobj.setAttributes(attrs);
+        return sobj;
+    }
+
+    /**
+     * Deprecated
+     * @see #of(String, String, java.util.Map)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, String content, Map<String, String> attrs) {
+        return of(key, content, attrs);
+    }
+
+    /**
+     * Construct an sobject with key, content and attributes specified in sequence
+     * key1, val1, key2, val2, ...
+     *
+     * @see #of(String, String, java.util.Map)
+     */
+    public static SObject of(String key, String content, String ... attrs) {
+        SObject sobj = of(key, content);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
     }
 
-    public static SObject valueOf(String key, String s) {
-        return new StringSObject(key, s);
+    /**
+     * Deprecated
+     * @see #of(String, String, String...)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, String content, String ... attrs) {
+        return of(key, content, attrs);
     }
 
-
-    public static SObject valueOf(String key, String s, Map<String, String> conf) {
-        SObject sobj = valueOf(key, s);
-        sobj.setAttributes(conf);
-        return sobj;
+    /**
+     * Construct an sobject with content in byte array and
+     * a random generated key
+     *
+     * @see #of(String, byte[])
+     */
+    public static SObject of(byte[] buf) {
+        return of(S.random(), buf);
     }
 
-    public static SObject valueOf(String key, String s, String ... attrs) {
-        SObject sobj = valueOf(key, s);
-        Map<String, String> map = C.map(attrs);
-        sobj.setAttributes(map);
-        return sobj;
-    }
-
-    public static SObject valueOf(String key, byte[] buf) {
+    /**
+     * Construct an sobject with specified key and content
+     * in byte array
+     * @see #of(String, byte[], java.util.Map)
+     */
+    public static SObject of(String key, byte[] buf) {
         return new ByteArraySObject(key, buf);
     }
 
-    public static SObject valueOf(String key, byte[] buf, Map<String, String> conf) {
+    /**
+     * Deprecated
+     * @see #of(String, byte[])
+     */
+    @Deprecated
+    public static SObject valueOf(String key, byte[] buf) {
+        return of(key, buf);
+    }
+
+    /**
+     * Construct an sobject with specified key, content as byte array
+     * and attributes in {@link java.util.Map}
+     *
+     * @see #of(String, byte[], String...)
+     */
+    public static SObject of(String key, byte[] buf, Map<String, String> attrs) {
         SObject sobj = valueOf(key, buf);
-        sobj.setAttributes(conf);
+        sobj.setAttributes(attrs);
         return sobj;
     }
 
-    public static SObject valueOf(String key, byte[] buf, String ... attrs) {
+    /**
+     * Deprecated
+     * @see #of(String, byte[], java.util.Map)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, byte[] buf, Map<String, String> attrs) {
+        return of(key, buf, attrs);
+    }
+
+    /**
+     * Construct an sobject with specified key, content in byte array and
+     * attributes in sequence of key1, val1, key1, val2, ...
+     * @see #of(String, byte[], java.util.Map)
+     */
+    public static SObject of(String key, byte[] buf, String ... attrs) {
         SObject sobj = valueOf(key, buf);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
+    }
+
+    /**
+     * Deprecated
+     * @see #of(String, byte[], String...)
+     */
+    @Deprecated
+    public static SObject valueOf(String key, byte[] buf, String ... attrs) {
+        return of(key, buf, attrs);
     }
 
     public static SObject valueOf(String key, ISObject copy) {
@@ -334,7 +569,7 @@ public abstract class SObject implements ISObject {
     }
 
     private static class ByteArraySObject extends SObject {
-        private byte[] buf_;
+        protected byte[] buf_;
 
         ByteArraySObject(String key, byte[] buf) {
             super(key);
@@ -372,6 +607,48 @@ public abstract class SObject implements ISObject {
         @Override
         public long getLength() {
             return buf_.length;
+        }
+    }
+
+    private static class InputStreamSObject extends SObject {
+        private final InputStream is_;
+
+        InputStreamSObject(String key, InputStream is) {
+            super(key);
+            E.NPE(is);
+            this.is_ = is;
+        }
+
+        @Override
+        public byte[] asByteArray() {
+            return IO.readContent(is_);
+        }
+
+        @Override
+        public File asFile() {
+            File tmpFile = createTempFile();
+            IO.write(is_, tmpFile);
+            return tmpFile;
+        }
+
+        @Override
+        public InputStream asInputStream() {
+            return is_;
+        }
+
+        @Override
+        public String asString() {
+            return asString(Charsets.UTF_8);
+        }
+
+        @Override
+        public String asString(Charset charset) throws UnexpectedIOException {
+            return new String(asByteArray(), charset);
+        }
+
+        @Override
+        public long getLength() {
+            throw E.unsupport();
         }
     }
 
