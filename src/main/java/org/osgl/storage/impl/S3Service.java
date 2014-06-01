@@ -8,9 +8,11 @@ import com.amazonaws.services.s3.model.*;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
+import org.osgl.util.C;
 import org.osgl.util.E;
 import org.osgl.util.S;
 
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -120,64 +122,31 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         if (noGet) {
             return SObject.getDumpObject(key);
         }
-        try {
-            ISObject sobj;
-            ObjectMetadata meta;
-            if (!loadMetaOnly || S.empty(staticWebEndPoint)) {
-                return forceGet(key);
-            } else {
-                GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, key);
-                meta = s3.getObjectMetadata(req);
-                sobj = SObject.getDumpObject(key);
-            }
-            
-            Map<String, String> map = meta.getUserMetadata();
-            for (String k : map.keySet()) {
-                sobj.setAttribute(k, map.get(k));
-            }
-            return sobj;
-        } catch (AmazonS3Exception e) {
-            return SObject.getInvalidObject(key, e);
-        }
+        return new S3Obj(key, this);
+    }
+
+    Map<String, String> getMeta(String key) {
+        if (noGet) return C.map();
+        GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, key);
+        ObjectMetadata meta = s3.getObjectMetadata(req);
+        return meta.getUserMetadata();
     }
 
     @Override
     public ISObject getFull(String key) {
-        try {
-            ISObject sobj;
-            ObjectMetadata meta;
-
-            GetObjectRequest req = new GetObjectRequest(bucket, key);
-            S3Object s3obj = s3.getObject(req);
-            sobj = SObject.valueOf(key, s3obj.getObjectContent());
-            meta = s3obj.getObjectMetadata();
-            
-            Map<String, String> map = meta.getUserMetadata();
-            for (String k : map.keySet()) {
-                sobj.setAttribute(k, map.get(k));
-            }
-            return sobj;
-        } catch (AmazonS3Exception e) {
-            return SObject.getInvalidObject(key, e);
-        }
+        return new S3Obj(key, this);
     }
 
     @Override
     public ISObject loadContent(ISObject sobj0) {
         String key = sobj0.getKey();
-        try {
-            ISObject sobj;
+        return new S3Obj(key, this);
+    }
 
-            GetObjectRequest req = new GetObjectRequest(bucket, key);
-            S3Object s3obj = s3.getObject(req);
-            sobj = SObject.valueOf(key, s3obj.getObjectContent());
-
-            Map<String, String> attrs = sobj0.getAttributes();
-            sobj.setAttributes(attrs);
-            return sobj;
-        } catch (AmazonS3Exception e) {
-            return SObject.getInvalidObject(key, e);
-        }
+    InputStream getInputStream(String key) {
+        GetObjectRequest req = new GetObjectRequest(bucket, key);
+        S3Object s3obj = s3.getObject(req);
+        return s3obj.getObjectContent();
     }
 
     @Override

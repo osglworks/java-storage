@@ -81,8 +81,8 @@ public interface IStorageService {
 
 
     /**
-     * Load content of an sobject. If the content is already loaded, then the object should
-     * be returned directly
+     * Load content of an sobject. If the content is already loaded, then
+     * the object should be returned directly
      *
      * @param sobj
      * @return the sobject with content presented

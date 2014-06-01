@@ -53,18 +53,18 @@ public abstract class SObject implements ISObject {
     }
 
     public static SObject getInvalidObject(String key, Throwable cause) {
-        SObject sobj = valueOf(key, "");
+        SObject sobj = of(key, "");
         sobj.valid = false;
         sobj.cause = cause;
         return sobj;
     }
 
     public static ISObject getDumpObject(String key) {
-        return valueOf(key, "");
+        return of(key, "");
     }
 
     public static ISObject getDumpObject(String key, Map<String, String> attrs) {
-        SObject sobj = valueOf(key, "");
+        SObject sobj = of(key, "");
         sobj.setAttrs(attrs);
         return sobj;
     }
@@ -447,7 +447,7 @@ public abstract class SObject implements ISObject {
     }
 
     public static SObject valueOf(String key, ISObject copy) {
-        SObject sobj = valueOf(key, copy.asByteArray());
+        SObject sobj = of(key, copy.asByteArray());
         sobj.setAttrs(copy.getAttributes());
         return sobj;
     }
@@ -579,7 +579,10 @@ public abstract class SObject implements ISObject {
         
         @Override
         public byte[] asByteArray() {
-            return buf_;
+            int len = buf_.length;
+            byte[] ba = new byte[len];
+            System.arraycopy(buf_, 0, ba, 0, len);
+            return ba;
         }
 
         @Override

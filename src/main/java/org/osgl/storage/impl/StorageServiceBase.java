@@ -44,7 +44,7 @@ public abstract class StorageServiceBase implements IStorageService {
     }
 
     @Override
-    public final ISObject forceGet(String key) {
+    public ISObject forceGet(String key) {
         return getFull(key);
     }
 
