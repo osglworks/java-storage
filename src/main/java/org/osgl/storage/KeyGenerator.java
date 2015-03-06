@@ -63,11 +63,11 @@ public enum KeyGenerator {
     protected abstract String tmpl();
     
     public String getKey(String name) {
-        if (S.empty(name)) {
+        if (S.blank(name)) {
             name = UUID.randomUUID().toString();
         }
         String tmpl = tmpl();
-        if (S.empty(tmpl)) {
+        if (S.blank(tmpl)) {
             return name;
         } else {
             return S.fmt(tmpl, Calendar.getInstance(), name);

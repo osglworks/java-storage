@@ -14,6 +14,13 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
+<!-- history
+0.3-SNAPSHOT
+- base verion when history log started
+
+0.4-SNAPSHOT
+- Upgrade to osgl-tool 0.4-SNAPSHOT
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +28,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
@@ -91,13 +98,13 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <version>0.4.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>0.2</version>
+            <version>0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>

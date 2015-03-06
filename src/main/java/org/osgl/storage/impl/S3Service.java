@@ -24,7 +24,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         STANDARD, REDUCED_REDUNDANCY, GLACIER;
 
         public static StorageClass valueOfIgnoreCase(String s, StorageClass def) {
-            if (S.empty(s)) {
+            if (S.blank(s)) {
                 return def;
             }
             s = s.trim();

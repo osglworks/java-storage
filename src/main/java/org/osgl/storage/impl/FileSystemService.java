@@ -116,6 +116,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
 
     @Override
     public void put(String key, ISObject stuff) {
+        E.NPE(stuff);
         key = key.replace('\\', '/');
         String[] path = key.split("/");
         int l = path.length;
