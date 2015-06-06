@@ -477,7 +477,7 @@ public abstract class SObject implements ISObject {
         }
     }
 
-    private static class StringSObject extends SObject {
+    static class StringSObject extends SObject {
         private String s_ = null;
 
         StringSObject(String key, String s) {
@@ -519,7 +519,7 @@ public abstract class SObject implements ISObject {
 
     }
 
-    private static class FileSObject extends SObject {
+    static class FileSObject extends SObject {
         private File file_;
         private byte[] ba_;
 
@@ -568,7 +568,7 @@ public abstract class SObject implements ISObject {
 
     }
 
-    private static class ByteArraySObject extends SObject {
+    static class ByteArraySObject extends SObject {
         protected byte[] buf_;
 
         ByteArraySObject(String key, byte[] buf) {
@@ -613,7 +613,7 @@ public abstract class SObject implements ISObject {
         }
     }
 
-    private static class InputStreamSObject extends SObject {
+    static class InputStreamSObject extends SObject {
         private final InputStream is_;
 
         InputStreamSObject(String key, InputStream is) {
@@ -655,7 +655,7 @@ public abstract class SObject implements ISObject {
         }
     }
 
-    private static class LazyLoadSObject extends SObject {
+    static class LazyLoadSObject extends SObject {
         private volatile ISObject sobj_;
         private IStorageService ss_;
 

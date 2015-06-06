@@ -81,7 +81,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             f = IO.child(f, path[i]);
             fa = IO.child(f.getParentFile(), path[i] + ".attr");
         }
-        ISObject obj = SObject.valueOf(key, f);
+        ISObject obj = SObject.of(key, f);
         if (fa.exists()) {
             try {
                 Properties p = new Properties();
@@ -109,7 +109,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             f = IO.child(f, path[i]);
         }
         Map<String, String> attrs = sobj.getAttributes();
-        sobj = SObject.valueOf(key, f);
+        sobj = SObject.of(key, f);
         sobj.setAttributes(attrs);
         return sobj;
     }
@@ -132,6 +132,9 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             }
         }
         File fObj = IO.child(f, path[l - 1]);
+        if (stuff instanceof SObject.FileSObject) {
+            return;
+        }
         OutputStream os = new BufferedOutputStream(IO.os(fObj));
         IO.write(IO.buffered(stuff.asInputStream()), os);
         
