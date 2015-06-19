@@ -95,8 +95,9 @@ public interface IStorageService {
      * 
      * @param key
      * @param stuff
+     * @return The new SObject representing the persistent data
      */
-    void put(String key, ISObject stuff) throws UnexpectedIOException;
+    ISObject put(String key, ISObject stuff) throws UnexpectedIOException;
     
     /**
      * Remove the file from the storage by key and return it to caller.

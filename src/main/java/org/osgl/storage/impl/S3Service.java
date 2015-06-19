@@ -150,14 +150,17 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     }
 
     @Override
-    public void put(String key, ISObject stuff) {
+    public ISObject put(String key, ISObject stuff) {
+        if (stuff instanceof S3Obj && S.eq(key, stuff.getKey())) {
+            return stuff;
+        }
         ObjectMetadata meta = new ObjectMetadata();
         Map<String, String> attrs = stuff.getAttributes();
         meta.setContentType(stuff.getAttribute(ISObject.ATTR_CONTENT_TYPE));
         meta.setContentLength(stuff.getLength());
         attrs.remove(ISObject.ATTR_CONTENT_TYPE);
-        meta.setUserMetadata(attrs); 
-        
+        meta.setUserMetadata(attrs);
+
         PutObjectRequest req = new PutObjectRequest(bucket, key, stuff.asInputStream(), meta);
         StorageClass storageClass = StorageClass.valueOfIgnoreCase(attrs.remove(ATTR_STORAGE_CLASS), defStorageClass);
         if (null != storageClass) {
@@ -165,6 +168,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         }
         req.withCannedAcl(CannedAccessControlList.PublicRead);
         s3.putObject(req);
+        return new S3Obj(key, this);
     }
 
     @Override

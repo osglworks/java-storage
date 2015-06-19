@@ -115,8 +115,11 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
     }
 
     @Override
-    public void put(String key, ISObject stuff) {
+    public ISObject put(String key, ISObject stuff) {
         E.NPE(stuff);
+        if (stuff instanceof SObject.FileSObject && S.eq(key, stuff.getKey())) {
+            return stuff;
+        }
         key = key.replace('\\', '/');
         String[] path = key.split("/");
         int l = path.length;
@@ -132,9 +135,6 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             }
         }
         File fObj = IO.child(f, path[l - 1]);
-        if (stuff instanceof SObject.FileSObject) {
-            return;
-        }
         OutputStream os = new BufferedOutputStream(IO.os(fObj));
         IO.write(IO.buffered(stuff.asInputStream()), os);
         
@@ -150,6 +150,9 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             }
             IO.close(os);
         }
+        SObject.FileSObject fsobj = new SObject.FileSObject(key, fObj);
+        fsobj.setAttributes(stuff.getAttributes());
+        return fsobj;
     }
 
     @Override
