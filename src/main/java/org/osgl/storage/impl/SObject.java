@@ -33,6 +33,7 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -521,7 +522,7 @@ public abstract class SObject implements ISObject {
 
     static class FileSObject extends SObject {
         private File file_;
-        private byte[] ba_;
+        private SoftReference<byte[]> cache;
 
         FileSObject(String key, File file) {
             super(key);
@@ -529,9 +530,14 @@ public abstract class SObject implements ISObject {
             file_ = file;
         }
 
-        private void readToCache() {
-            if (null != ba_) return;
-            ba_ = IO.readContent(file_);
+        private synchronized byte[] read() {
+            if (null != cache) {
+                byte[] ba = cache.get();
+                if (null != ba) return ba;
+            }
+            byte[] ba = IO.readContent(file_);
+            cache = new SoftReference<byte[]>(ba);
+            return ba;
         }
 
         @Override
@@ -551,14 +557,12 @@ public abstract class SObject implements ISObject {
 
         @Override
         public String asString(Charset charset) throws UnexpectedIOException {
-            readToCache();
-            return new String(ba_, charset);
+            return new String(read(), charset);
         }
 
         @Override
         public byte[] asByteArray() throws UnexpectedIOException {
-            readToCache();
-            return ba_;
+            return read();
         }
 
         @Override

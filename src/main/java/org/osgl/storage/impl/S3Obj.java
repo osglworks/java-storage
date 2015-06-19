@@ -7,14 +7,12 @@ import org.osgl.util.IO;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
 
-/**
- * Created by luog on 28/05/2014.
- */
 class S3Obj extends SObject {
     private transient S3Service s3;
-    private byte[] buf_ = null;
+    private SoftReference<byte[]> cache;
 
     S3Obj(String key, S3Service s3) {
         super(key);
@@ -27,18 +25,23 @@ class S3Obj extends SObject {
         return 0;
     }
 
-    private synchronized void flush() {
-        if (null != buf_) return;
+    private synchronized byte[] read() {
+        if (null != cache) {
+            byte[] ba = cache.get();
+            if (null != ba) {
+                return ba;
+            }
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStream is = s3.getInputStream(getKey());
         IO.copy(is, baos);
-        IO.close(is);
-        buf_ = baos.toByteArray();
+        byte[] ba = baos.toByteArray();
+        cache = new SoftReference<byte[]>(ba);
+        return ba;
     }
 
     private ISObject buf() {
-        flush();
-        return SObject.of(buf_);
+        return SObject.of(read());
     }
 
     @Override

@@ -23,6 +23,9 @@
 
 0.4.1-SNAPSHOT
 - Fix issue when saving loaded SObject from file back it result in an empty file
+
+0.4.2-SNAPSHOT
+- Use SoftReference to wrap byte array buffer for FileObject and S3Obj to prevent potential memory issue
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -31,7 +34,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>0.4.2-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
