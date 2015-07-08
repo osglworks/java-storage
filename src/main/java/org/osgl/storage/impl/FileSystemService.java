@@ -63,6 +63,10 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         configure(conf);
     }
 
+    public File root() {
+        return root_;
+    }
+
     @Override
     public String getUrl(String key) {
         return null == urlRoot_ ? null : urlRoot_ + key;
