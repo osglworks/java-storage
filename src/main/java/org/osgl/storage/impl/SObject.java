@@ -53,6 +53,11 @@ public abstract class SObject implements ISObject {
         this.key = key;
     }
 
+    @Override
+    public boolean isDumb() {
+        return false;
+    }
+
     public static SObject getInvalidObject(String key, Throwable cause) {
         SObject sobj = of(key, "");
         sobj.valid = false;
@@ -61,7 +66,9 @@ public abstract class SObject implements ISObject {
     }
 
     public static ISObject getDumpObject(String key) {
-        return of(key, "");
+        StringSObject sobj = new StringSObject(key, "");
+        sobj.dumb = true;
+        return sobj;
     }
 
     public static ISObject getDumpObject(String key, Map<String, String> attrs) {
@@ -480,6 +487,7 @@ public abstract class SObject implements ISObject {
 
     static class StringSObject extends SObject {
         private String s_ = null;
+        private boolean dumb = false;
 
         StringSObject(String key, String s) {
             super(key);
@@ -518,6 +526,10 @@ public abstract class SObject implements ISObject {
             return s_.length();
         }
 
+        @Override
+        public boolean isDumb() {
+            return dumb;
+        }
     }
 
     static class FileSObject extends SObject {

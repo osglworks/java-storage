@@ -137,4 +137,10 @@ public interface ISObject extends Serializable {
      */
    void consumeOnce(_.Function<InputStream, ?> consumer) throws UnexpectedIOException;
 
+    /**
+     * Returns {@code true} if this SObject is {@link org.osgl.storage.impl.SObject.getDumpObject()
+     * dumb object}
+     */
+    boolean isDumb();
+
 }
