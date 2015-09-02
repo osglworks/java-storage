@@ -5,5 +5,5 @@
 *.war
 *.ear
 target
-
+deploy
 *.iml
