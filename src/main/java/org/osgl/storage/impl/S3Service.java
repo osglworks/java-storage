@@ -1,5 +1,6 @@
 package org.osgl.storage.impl;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -45,6 +46,11 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     public static final String CONF_DEF_STORAGE_CLASS = "storage.s3.defStorageClass";
     public static final String CONF_BUCKET = "storage.s3.bucket";
     public static final String CONF_STATIC_WEB_ENDPOINT = "storage.s3.staticWebEndpoint";
+    public static final String CONF_MAX_ERROR_RETRY = "storage.s3.maxErrorRetry";
+    public static final String CONF_CONN_TIMEOUT = "storage.s3.connectionTimeout";
+    public static final String CONF_SOCKET_TIMEOUT = "storage.s3.socketTimeout";
+    public static final String CONF_TCP_KEEP_ALIVE = "storage.s3.tcpKeepAlive";
+    public static final String CONF_MAX_CONN = "storage.s3.maxConnection";
 
     /**
      * Get Meta Data only 
@@ -99,7 +105,30 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         staticWebEndPoint = conf.get(CONF_STATIC_WEB_ENDPOINT);
         System.setProperty("line.separator", "\n");
         AWSCredentials cred = new BasicAWSCredentials(awsKeyId, awsKeySecret);
-        s3 = new AmazonS3Client(cred);
+
+        ClientConfiguration cc = new ClientConfiguration();
+        if (conf.containsKey(CONF_MAX_ERROR_RETRY)) {
+            int n = Integer.parseInt(conf.get(CONF_MAX_ERROR_RETRY));
+            cc = cc.withMaxErrorRetry(n);
+        }
+        if (conf.containsKey(CONF_CONN_TIMEOUT)) {
+            int n = Integer.parseInt(conf.get(CONF_CONN_TIMEOUT));
+            cc = cc.withConnectionTimeout(n);
+        }
+        if (conf.containsKey(CONF_MAX_CONN)) {
+            int n = Integer.parseInt(conf.get(CONF_MAX_CONN));
+            cc = cc.withMaxConnections(n);
+        }
+        if (conf.containsKey(CONF_TCP_KEEP_ALIVE)) {
+            boolean b = Boolean.parseBoolean(conf.get(CONF_TCP_KEEP_ALIVE));
+            cc = cc.withTcpKeepAlive(b);
+        }
+        if (conf.containsKey(CONF_SOCKET_TIMEOUT)) {
+            int n = Integer.parseInt(conf.get(CONF_SOCKET_TIMEOUT));
+            cc = cc.withSocketTimeout(n);
+        }
+
+        s3 = new AmazonS3Client(cred, cc);
 
         if (conf.containsKey(CONF_GET_META_ONLY)) {
             loadMetaOnly = Boolean.parseBoolean(conf.get(CONF_GET_META_ONLY));

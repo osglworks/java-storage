@@ -32,6 +32,14 @@
 
 0.5.1-SNAPSHOT
 - Add isDump() method to ISObject interface
+
+0.5.2-SNAPSHOT
+- Add new configuration items for S3 storage:
+* CONF_MAX_ERROR_RETRY
+* CONF_CONN_TIMEOUT
+* CONF_SOCKET_TIMEOUT
+* CONF_TCP_KEEP_ALIVE
+* CONF_MAX_CONN
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -40,7 +48,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.2-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
