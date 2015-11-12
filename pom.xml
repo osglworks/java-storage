@@ -40,6 +40,9 @@
 * CONF_SOCKET_TIMEOUT
 * CONF_TCP_KEEP_ALIVE
 * CONF_MAX_CONN
+
+0.5.3-SNAPSHOT
+* upgrade to osgl-tool 7.1-SNAPSHOT
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -118,13 +121,13 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-tool</artifactId>
-            <version>0.4.3-SNAPSHOT</version>
+            <version>0.7.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>

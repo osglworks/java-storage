@@ -7,3 +7,4 @@
 target
 deploy
 *.iml
+.idea/
