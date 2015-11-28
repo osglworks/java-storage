@@ -20,7 +20,7 @@
 package org.osgl.storage.impl;
 
 import org.apache.commons.codec.Charsets;
-import org.osgl._;
+import org.osgl.$;
 import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
@@ -130,7 +130,7 @@ public abstract class SObject implements ISObject {
     }
 
     @Override
-    public void consumeOnce(_.Function<InputStream, ?> consumer) {
+    public void consumeOnce($.Function<InputStream, ?> consumer) {
         InputStream is = null;
         try {
             is = asInputStream();

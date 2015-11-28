@@ -19,7 +19,7 @@
 */
 package org.osgl.storage;
 
-import org.osgl._;
+import org.osgl.$;
 import org.osgl.exception.UnexpectedIOException;
 
 import java.io.File;
@@ -135,7 +135,7 @@ public interface ISObject extends Serializable {
      * Consume the inputstream of this storage object one time and then close the input stream
      * @param consumer the consumer function
      */
-   void consumeOnce(_.Function<InputStream, ?> consumer) throws UnexpectedIOException;
+   void consumeOnce($.Function<InputStream, ?> consumer) throws UnexpectedIOException;
 
     /**
      * Returns {@code true} if this SObject is {@link org.osgl.storage.impl.SObject.getDumpObject()
