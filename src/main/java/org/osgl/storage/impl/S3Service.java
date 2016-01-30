@@ -73,7 +73,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     private String staticWebEndPoint = null;
     private boolean loadMetaOnly = false;
     private boolean noGet = false;
-    
+
     
     public static AmazonS3 s3;
     
@@ -81,8 +81,12 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         super(keygen); 
     }
 
+    public S3Service(KeyGenerator keygen, String contextPath) {
+        super(keygen, contextPath);
+    }
+
     public S3Service(Map<String, String> conf) {
-        super.configure(conf);
+        configure(conf);
     }
 
     @Override
@@ -156,7 +160,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
 
     Map<String, String> getMeta(String key) {
         if (noGet) return C.map();
-        GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, key);
+        GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, keyWithContextPath(key));
         ObjectMetadata meta = s3.getObjectMetadata(req);
         return meta.getUserMetadata();
     }
@@ -173,7 +177,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     }
 
     InputStream getInputStream(String key) {
-        GetObjectRequest req = new GetObjectRequest(bucket, key);
+        GetObjectRequest req = new GetObjectRequest(bucket, keyWithContextPath(key));
         S3Object s3obj = s3.getObject(req);
         return s3obj.getObjectContent();
     }
@@ -190,7 +194,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         attrs.remove(ISObject.ATTR_CONTENT_TYPE);
         meta.setUserMetadata(attrs);
 
-        PutObjectRequest req = new PutObjectRequest(bucket, key, stuff.asInputStream(), meta);
+        PutObjectRequest req = new PutObjectRequest(bucket, keyWithContextPath(key), stuff.asInputStream(), meta);
         StorageClass storageClass = StorageClass.valueOfIgnoreCase(attrs.remove(ATTR_STORAGE_CLASS), defStorageClass);
         if (null != storageClass) {
             req.setStorageClass(storageClass.toString());
@@ -202,7 +206,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
 
     @Override
     public void remove(String key) {
-        s3.deleteObject(new DeleteObjectRequest(bucket, key));
+        s3.deleteObject(new DeleteObjectRequest(bucket, keyWithContextPath(key)));
 //        S3Action act = S3Action.delete(key, this);
 //        WS.HttpResponse resp = act.doIt();
     }
@@ -212,6 +216,14 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         if (null == staticWebEndPoint) {
             return null;
         }
-        return "//" + staticWebEndPoint + "/" + key;
+        return "//" + staticWebEndPoint + "/" + keyWithContextPath(key);
+    }
+
+    @Override
+    public IStorageService subFolder(String path) {
+        S3Service subFolder = new S3Service(conf);
+        subFolder.keygen = this.keygen;
+        subFolder.contextPath = keyWithContextPath(path);
+        return subFolder;
     }
 }

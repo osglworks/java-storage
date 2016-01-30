@@ -26,16 +26,25 @@ import java.util.Map;
 
 
 /**
- * Define A storage service
+ * Provide persistent service for {@link ISObject}
  */
 public interface IStorageService {
 
-    public static final String CONF_KEY_GEN = "storage.keygen";
+    String DEFAULT = "default";
+    String CONF_KEY_GEN = "storage.keygen";
+    String CONF_CONTEXT_PATH = "storage.context";
+    String CONF_ID = "storage.id";
+
+    /**
+     * Return the ID of the service.
+     * @return the service id
+     */
+    String id();
 
     /**
      * Configure the service
      * 
-     * @param conf
+     * @param conf the configuration map
      */
     void configure(Map<String, String> conf);
     
@@ -107,6 +116,14 @@ public interface IStorageService {
     void remove(String key);
 
     /**
+     * Return the context path. A context path is the path from where
+     * all the storage should happen. By default context path
+     * is "/"
+     * @return the context path
+     */
+    String getContextPath();
+
+    /**
      * Return the URL to access a stored resource by key 
      * 
      * @param key
@@ -116,7 +133,14 @@ public interface IStorageService {
     
     String getKey(String key);
     
-    public String getKey();
+    String getKey();
+
+    /**
+     * Returns a storage service whose root is a sub folder of this storage service
+     * @param path the path to sub folder
+     * @return the new storage service instance as described above
+     */
+    IStorageService subFolder(String path);
     
     public static class f {
         public static $.F0<Void> put(final String key, final ISObject stuff, final IStorageService ss) {

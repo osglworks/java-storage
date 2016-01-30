@@ -530,6 +530,28 @@ public abstract class SObject implements ISObject {
         public boolean isDumb() {
             return dumb;
         }
+
+        @Override
+        public int hashCode() {
+            return $.hc(getKey());
+        }
+
+        @Override
+        public String toString() {
+            return s_;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof SObject) {
+                SObject that = (SObject) obj;
+                return $.eq(that.getKey(), getKey()) && $.eq(that.asString().toString(), toString());
+            }
+            return false;
+        }
     }
 
     static class FileSObject extends SObject {
