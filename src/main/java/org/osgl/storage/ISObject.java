@@ -46,6 +46,16 @@ public interface ISObject extends Serializable {
     public static final String ATTR_FILE_NAME = "filename";
 
     /**
+     * The storage service ID
+     */
+    public static final String ATTR_SS_ID = "ss_id";
+
+    /**
+     * Store the URL point to this sobject
+     */
+    public static final String ATTR_URL = "url";
+
+    /**
      * @return key of this object
      */
     String getKey();

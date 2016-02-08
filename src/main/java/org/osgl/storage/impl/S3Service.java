@@ -155,25 +155,45 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         if (noGet) {
             return SObject.getDumpObject(key);
         }
-        return new S3Obj(key, this);
+        ISObject sobj = new S3Obj(key, this);
+        sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != staticWebEndPoint) {
+            sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
+        return sobj;
     }
 
     Map<String, String> getMeta(String key) {
         if (noGet) return C.map();
         GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, keyWithContextPath(key));
         ObjectMetadata meta = s3.getObjectMetadata(req);
-        return meta.getUserMetadata();
+        Map<String, String> map = meta.getUserMetadata();
+        map.put(ISObject.ATTR_SS_ID, id());
+        if (null != staticWebEndPoint) {
+            map.put(ISObject.ATTR_URL, getUrl(key));
+        }
+        return map;
     }
 
     @Override
     public ISObject getFull(String key) {
-        return new S3Obj(key, this);
+        ISObject sobj = new S3Obj(key, this);
+        sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != staticWebEndPoint) {
+            sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
+        return sobj;
     }
 
     @Override
     public ISObject loadContent(ISObject sobj0) {
         String key = sobj0.getKey();
-        return new S3Obj(key, this);
+        ISObject sobj = new S3Obj(key, this);
+        sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != staticWebEndPoint) {
+            sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
+        return sobj;
     }
 
     InputStream getInputStream(String key) {
@@ -184,7 +204,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
 
     @Override
     public ISObject put(String key, ISObject stuff) {
-        if (stuff instanceof S3Obj && S.eq(key, stuff.getKey())) {
+        if (stuff instanceof S3Obj && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID))) {
             return stuff;
         }
         ObjectMetadata meta = new ObjectMetadata();
@@ -201,7 +221,12 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         }
         req.withCannedAcl(CannedAccessControlList.PublicRead);
         s3.putObject(req);
-        return new S3Obj(key, this);
+        ISObject sobj = new S3Obj(key, this);
+        sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != staticWebEndPoint) {
+            sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
+        return sobj;
     }
 
     @Override

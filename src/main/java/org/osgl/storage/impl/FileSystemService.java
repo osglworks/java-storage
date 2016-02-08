@@ -98,6 +98,10 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
                 throw E.ioException(e);
             }
         }
+        obj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != urlRoot_) {
+            obj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
         return obj;
     }
 
@@ -114,13 +118,17 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         Map<String, String> attrs = sobj.getAttributes();
         sobj = SObject.of(key, f);
         sobj.setAttributes(attrs);
+        sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != urlRoot_) {
+            sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
         return sobj;
     }
 
     @Override
     public ISObject put(String key, ISObject stuff) {
         E.NPE(stuff);
-        if (stuff instanceof SObject.FileSObject && S.eq(key, stuff.getKey())) {
+        if (stuff instanceof SObject.FileSObject && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID))) {
             return stuff;
         }
         key = key.replace('\\', '/');
@@ -153,6 +161,10 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         }
         SObject.FileSObject fsobj = new SObject.FileSObject(key, fObj);
         fsobj.setAttributes(stuff.getAttributes());
+        fsobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        if (null != urlRoot_) {
+            fsobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
+        }
         return fsobj;
     }
 
