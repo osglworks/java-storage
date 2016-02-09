@@ -42,6 +42,12 @@ public interface IStorageService {
     String id();
 
     /**
+     * alias of {@link #getContextPath()}
+     * @return the context path
+     */
+    String contextPath();
+
+    /**
      * Configure the service
      * 
      * @param conf the configuration map
@@ -118,7 +124,7 @@ public interface IStorageService {
     /**
      * Return the context path. A context path is the path from where
      * all the storage should happen. By default context path
-     * is "/"
+     * is ""
      * @return the context path
      */
     String getContextPath();

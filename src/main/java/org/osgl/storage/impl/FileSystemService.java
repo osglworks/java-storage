@@ -99,6 +99,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
             }
         }
         obj.setAttribute(ISObject.ATTR_SS_ID, id());
+        obj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != urlRoot_) {
             obj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -119,6 +120,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         sobj = SObject.of(key, f);
         sobj.setAttributes(attrs);
         sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        sobj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != urlRoot_) {
             sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -128,7 +130,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
     @Override
     public ISObject put(String key, ISObject stuff) {
         E.NPE(stuff);
-        if (stuff instanceof SObject.FileSObject && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID))) {
+        if (stuff instanceof SObject.FileSObject && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID)) && S.eq(contextPath(), stuff.getAttribute(ISObject.ATTR_SS_CTX))) {
             return stuff;
         }
         key = key.replace('\\', '/');
@@ -162,6 +164,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
         SObject.FileSObject fsobj = new SObject.FileSObject(key, fObj);
         fsobj.setAttributes(stuff.getAttributes());
         fsobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        fsobj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != urlRoot_) {
             fsobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -185,7 +188,7 @@ public class FileSystemService extends StorageServiceBase implements IStorageSer
     }
 
     @Override
-    public IStorageService subFolder(String path) {
+    protected IStorageService createSubFolder(String path) {
         FileSystemService subFolder = new FileSystemService(conf);
         subFolder.keygen = keygen;
         subFolder.contextPath = keyWithContextPath(path);

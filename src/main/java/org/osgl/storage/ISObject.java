@@ -51,6 +51,11 @@ public interface ISObject extends Serializable {
     public static final String ATTR_SS_ID = "ss_id";
 
     /**
+     * The storage service context path
+     */
+    public static final String ATTR_SS_CTX = "ss_ctx";
+
+    /**
      * Store the URL point to this sobject
      */
     public static final String ATTR_URL = "url";

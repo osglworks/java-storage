@@ -143,13 +143,6 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         }
     }
 
-//    String authStr(String stringToSign) {
-//        byte[] key = awsKeySecret.getBytes();
-//        String ss = Crypto.sign(stringToSign, key);
-//        ss = Codec.encodeBASE64(ss);
-//        return "AWS " + awsKeyId + ":" + ss;
-//    }
-
     @Override
     public ISObject get(String key) {
         if (noGet) {
@@ -157,6 +150,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         }
         ISObject sobj = new S3Obj(key, this);
         sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        sobj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != staticWebEndPoint) {
             sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -190,6 +184,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         String key = sobj0.getKey();
         ISObject sobj = new S3Obj(key, this);
         sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        sobj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != staticWebEndPoint) {
             sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -204,7 +199,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
 
     @Override
     public ISObject put(String key, ISObject stuff) {
-        if (stuff instanceof S3Obj && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID))) {
+        if (stuff instanceof S3Obj && S.eq(key, stuff.getKey()) && S.eq(id(), stuff.getAttribute(ISObject.ATTR_SS_ID)) && S.eq(contextPath(), stuff.getAttribute(ISObject.ATTR_SS_CTX))) {
             return stuff;
         }
         ObjectMetadata meta = new ObjectMetadata();
@@ -223,6 +218,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
         s3.putObject(req);
         ISObject sobj = new S3Obj(key, this);
         sobj.setAttribute(ISObject.ATTR_SS_ID, id());
+        sobj.setAttribute(ISObject.ATTR_SS_CTX, contextPath());
         if (null != staticWebEndPoint) {
             sobj.setAttribute(ISObject.ATTR_URL, getUrl(key));
         }
@@ -232,8 +228,6 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     @Override
     public void remove(String key) {
         s3.deleteObject(new DeleteObjectRequest(bucket, keyWithContextPath(key)));
-//        S3Action act = S3Action.delete(key, this);
-//        WS.HttpResponse resp = act.doIt();
     }
 
     @Override
@@ -245,7 +239,7 @@ public class S3Service extends StorageServiceBase implements IStorageService {
     }
 
     @Override
-    public IStorageService subFolder(String path) {
+    protected IStorageService createSubFolder(String path) {
         S3Service subFolder = new S3Service(conf);
         subFolder.keygen = this.keygen;
         subFolder.contextPath = keyWithContextPath(path);

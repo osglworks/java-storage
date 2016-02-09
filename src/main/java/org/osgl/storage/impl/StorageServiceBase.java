@@ -24,6 +24,7 @@ public abstract class StorageServiceBase implements IStorageService {
     protected KeyGenerator keygen;
     protected String contextPath;
     protected Map<String, String> conf = C.newMap();
+    protected Map<String, IStorageService> subFolders = C.newMap();
 
     protected StorageServiceBase(){
         keygen = BY_DATE;
@@ -62,6 +63,11 @@ public abstract class StorageServiceBase implements IStorageService {
     @Override
     public String id() {
         return id;
+    }
+
+    @Override
+    public String contextPath() {
+        return getContextPath();
     }
 
     @Override
@@ -111,7 +117,7 @@ public abstract class StorageServiceBase implements IStorageService {
     }
 
     protected String keyWithContextPath(String key) {
-        if ("" == contextPath) {
+        if ("".equals(contextPath)) {
             return key;
         }
         StringBuilder sb = new StringBuilder(contextPath);
@@ -122,4 +128,15 @@ public abstract class StorageServiceBase implements IStorageService {
         return sb.toString();
     }
 
+    @Override
+    public synchronized IStorageService subFolder(String path) {
+        IStorageService ss = subFolders.get(path);
+        if (null == ss) {
+            ss = createSubFolder(path);
+            subFolders.put(path, ss);
+        }
+        return ss;
+    }
+
+    protected abstract IStorageService createSubFolder(String contextPath);
 }
