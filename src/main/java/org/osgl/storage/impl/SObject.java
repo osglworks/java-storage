@@ -24,10 +24,7 @@ import org.osgl.$;
 import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
-import org.osgl.util.C;
-import org.osgl.util.E;
-import org.osgl.util.IO;
-import org.osgl.util.S;
+import org.osgl.util.*;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
@@ -225,7 +222,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, java.io.InputStream)
      */
     public static SObject of(InputStream is) {
-        return of(S.random(), is);
+        return of(randomKey(), is);
     }
 
     /**
@@ -322,7 +319,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, String)
      */
     public static SObject of(String content) {
-        return new StringSObject(S.random(), content);
+        return new StringSObject(randomKey(), content);
     }
 
     /**
@@ -391,7 +388,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[])
      */
     public static SObject of(byte[] buf) {
-        return of(S.random(), buf);
+        return of(randomKey(), buf);
     }
 
     /**
@@ -419,7 +416,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[], String...)
      */
     public static SObject of(String key, byte[] buf, Map<String, String> attrs) {
-        SObject sobj = valueOf(key, buf);
+        SObject sobj = of(key, buf);
         sobj.setAttributes(attrs);
         return sobj;
     }
@@ -439,7 +436,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[], java.util.Map)
      */
     public static SObject of(String key, byte[] buf, String ... attrs) {
-        SObject sobj = valueOf(key, buf);
+        SObject sobj = of(key, buf);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
@@ -743,4 +740,7 @@ public abstract class SObject implements ISObject {
         }
     }
 
+    private static String randomKey() {
+        return Codec.encodeUrl(S.random());
+    }
 }
