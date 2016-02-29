@@ -138,8 +138,8 @@ public class BlobService extends StorageServiceBase implements IStorageService {
             return sobj;
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
+            throw new UnexpectedIOException(exception.getMessage());
         }
-        return null;
     }
 
     @Override
@@ -149,6 +149,7 @@ public class BlobService extends StorageServiceBase implements IStorageService {
             blob.deleteIfExists();
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
+            throw new UnexpectedIOException(exception.getMessage());
         }
     }
 
@@ -159,7 +160,10 @@ public class BlobService extends StorageServiceBase implements IStorageService {
 
     @Override
     protected IStorageService createSubFolder(String contextPath) {
-        return null;
+        BlobService subFolder = new BlobService(conf);
+        subFolder.keygen = this.keygen;
+        subFolder.contextPath = keyWithContextPath(contextPath);
+        return subFolder;
     }
 
     public Map<String,String> getMeta(String resourceKey) {

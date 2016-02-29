@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
 
-public class BlobObject extends SObject {
+class BlobObject extends SObject {
 
     private transient BlobService blobService;
     private SoftReference<byte[]> cache;
