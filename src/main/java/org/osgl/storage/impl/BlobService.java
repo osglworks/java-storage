@@ -6,10 +6,12 @@ import org.osgl.exception.ConfigurationException;
 import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
+import org.osgl.util.E;
 import org.osgl.util.S;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -74,7 +76,7 @@ public class BlobService extends StorageServiceBase implements IStorageService {
             blobContainer.uploadPermissions(containerPermissions);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
-            throw new ConfigurationException(exception.getMessage());
+            throw new ConfigurationException(exception);
         }
     }
 
@@ -136,9 +138,11 @@ public class BlobService extends StorageServiceBase implements IStorageService {
                 sobj.setAttribute(ISObject.ATTR_URL, getUrl(resourceKey));
             }
             return sobj;
-        } catch (Exception exception) {
+        } catch (IOException exception) {
             log.error(exception.getMessage(), exception);
-            throw new UnexpectedIOException(exception.getMessage());
+            throw new UnexpectedIOException(exception);
+        } catch (Exception e) {
+            throw E.unexpected(e);
         }
     }
 
@@ -147,9 +151,8 @@ public class BlobService extends StorageServiceBase implements IStorageService {
         try {
             CloudBlockBlob blob = blobContainer.getBlockBlobReference(resourceKey);
             blob.deleteIfExists();
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
-            throw new UnexpectedIOException(exception.getMessage());
+        } catch (Exception e) {
+            throw E.unexpected(e);
         }
     }
 
