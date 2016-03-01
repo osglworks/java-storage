@@ -150,8 +150,8 @@
 
         <dependency>
             <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>1.10.9</version>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.10.54</version>
             <scope>provided</scope>
         </dependency>
 
