@@ -148,10 +148,20 @@
             <scope>provided</scope>
         </dependency>
 
+
+        <!-- AWS S3 storage system -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.10.54</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Azure Blog storage system -->
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-storage</artifactId>
+            <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
 
