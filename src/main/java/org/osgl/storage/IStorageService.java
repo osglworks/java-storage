@@ -37,28 +37,23 @@ public interface IStorageService {
 
     /**
      * Return the ID of the service.
+     *
      * @return the service id
      */
     String id();
 
     /**
      * alias of {@link #getContextPath()}
+     *
      * @return the context path
      */
     String contextPath();
 
     /**
-     * Configure the service
-     * 
-     * @param conf the configuration map
-     */
-    void configure(Map<String, String> conf);
-    
-    /**
      * Retrieve the stuff from the storage by key
-     * 
+     * <p>
      * If file cannot be find by key, then <code>null</code> is returned
-     * 
+     *
      * @param key
      * @return the file associated with key or null if not found
      */
@@ -77,11 +72,11 @@ public interface IStorageService {
 
     /**
      * Force retrieving the stuff with content from storage without regarding to the configuration
-     * 
+     *
      * @param key
      * @return the storage stuff
-     * @deprecated
      * @see #getFull(String)
+     * @deprecated
      */
     ISObject forceGet(String key);
 
@@ -103,20 +98,20 @@ public interface IStorageService {
      * @return the sobject with content presented
      */
     ISObject loadContent(ISObject sobj);
-    
+
     /**
      * Update the stuff in the storage. If the existing file cannot be find
      * in the storage then it will be added.
-     * 
+     *
      * @param key
      * @param stuff
      * @return The new SObject representing the persistent data
      */
     ISObject put(String key, ISObject stuff) throws UnexpectedIOException;
-    
+
     /**
      * Remove the file from the storage by key and return it to caller.
-     * 
+     *
      * @param key
      */
     void remove(String key);
@@ -125,29 +120,31 @@ public interface IStorageService {
      * Return the context path. A context path is the path from where
      * all the storage should happen. By default context path
      * is ""
+     *
      * @return the context path
      */
     String getContextPath();
 
     /**
-     * Return the URL to access a stored resource by key 
-     * 
+     * Return the URL to access a stored resource by key
+     *
      * @param key
      * @return the URL
      */
     String getUrl(String key);
-    
+
     String getKey(String key);
-    
+
     String getKey();
 
     /**
      * Returns a storage service whose root is a sub folder of this storage service
+     *
      * @param path the path to sub folder
      * @return the new storage service instance as described above
      */
     IStorageService subFolder(String path);
-    
+
     public static class f {
         public static $.F0<Void> put(final String key, final ISObject stuff, final IStorageService ss) {
             return put().curry(key, stuff, ss);
@@ -166,7 +163,7 @@ public interface IStorageService {
         public static $.F0<ISObject> get(final String key, IStorageService ss) {
             return get().curry(key, ss);
         }
-        
+
         public static $.F2<String, IStorageService, ISObject> get() {
             return new $.F2<String, IStorageService, ISObject>() {
                 @Override
@@ -179,7 +176,7 @@ public interface IStorageService {
         public static $.F0<Void> remove(final String key, IStorageService ss) {
             return remove().curry(key, ss);
         }
-        
+
         public static $.F2<String, IStorageService, Void> remove() {
             return new $.F2<String, IStorageService, Void>() {
                 @Override

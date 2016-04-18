@@ -3,6 +3,7 @@ package org.osgl.storage.impl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.TestBase;
@@ -53,12 +54,11 @@ public class FileSystemServiceTest extends TestBase {
         eq(sobj.asString(), loaded.asString());
     }
 
-    @Test
+    @Test(expected = UnexpectedIOException.class)
     public void testSubFolderRemove() {
         fss.put(subFolderPath + "/" + key1, sobj);
         subFolder.remove(key1);
-        ISObject loaded = fss.get(subFolderPath + "/" + key1);
-        no(loaded.isValid());
+        fss.get(subFolderPath + "/" + key1);
     }
 
 }

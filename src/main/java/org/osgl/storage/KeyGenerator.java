@@ -42,16 +42,16 @@ public enum KeyGenerator {
         }
     },
     /**
-     * Items stored in a hierarchy structured by date: /yyyy/MM/dd/item 
+     * Items stored in a hierarchy structured by date: /yyyy/MM/dd/item
      */
     BY_DATE {
         @Override
         protected String tmpl() {
             return "%1$tY/%1$tm/%1$td/%2$s";
         }
-    }, 
+    },
     /**
-     * Items stored in a hierarchy structured by date and time: /yyyy/MM/dd/HH/mm/ss/item 
+     * Items stored in a hierarchy structured by date and time: /yyyy/MM/dd/HH/mm/ss/item
      */
     BY_DATETIME {
         @Override
@@ -59,9 +59,9 @@ public enum KeyGenerator {
             return "%1$tY/%1$tm/%1$td/%1$tH/%1$tM/%1$tS/%2$s";
         }
     };
-    
+
     protected abstract String tmpl();
-    
+
     public String getKey(String name) {
         if (S.blank(name)) {
             name = UUID.randomUUID().toString();
@@ -73,7 +73,7 @@ public enum KeyGenerator {
             return S.fmt(tmpl, Calendar.getInstance(), name);
         }
     }
-    
+
     public String getKey() {
         return getKey(null);
     }

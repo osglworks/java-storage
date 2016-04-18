@@ -43,6 +43,7 @@ public abstract class SObject implements ISObject {
     private Map<String, String> attrs = new HashMap<String, String>();
     private boolean valid = true;
     private Throwable cause = null;
+
     SObject(String key) {
         if (null == key) {
             throw new NullPointerException();
@@ -73,7 +74,7 @@ public abstract class SObject implements ISObject {
         sobj.setAttrs(attrs);
         return sobj;
     }
-    
+
     public String getKey() {
         return key;
     }
@@ -140,6 +141,7 @@ public abstract class SObject implements ISObject {
     /**
      * Construct an SObject with file specified. The key to the
      * sobject is the file's path
+     *
      * @param file
      * @return an SObject
      */
@@ -149,6 +151,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Construct an SObject with key and file specified
+     *
      * @see #of(String, java.io.File, java.util.Map)
      */
     public static SObject of(String key, File file) {
@@ -164,6 +167,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, java.io.File)
      */
     @Deprecated
@@ -174,6 +178,7 @@ public abstract class SObject implements ISObject {
     /**
      * Construct an SObject with specified key, file and attributes
      * specified in {@link java.util.Map}
+     *
      * @see #of(String, java.io.File, String...)
      */
     public static SObject of(String key, File file, Map<String, String> attributes) {
@@ -193,9 +198,10 @@ public abstract class SObject implements ISObject {
     /**
      * Construct an SObject with key, file and attributes specified in
      * key1, val1, key2, val2... sequence
+     *
      * @see #of(String, java.io.File, java.util.Map)
      */
-    public static SObject of(String key, File file, String ... attrs) {
+    public static SObject of(String key, File file, String... attrs) {
         SObject sobj = of(key, file);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
@@ -204,17 +210,18 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, java.io.File, String...)
      */
     @Deprecated
-    public static SObject valueOf(String key, File file, String ... attrs) {
+    public static SObject valueOf(String key, File file, String... attrs) {
         return of(key, file, attrs);
     }
 
     /**
      * Construct an sobject with specified input stream and a randomly
      * generated key.
-     *
+     * <p>
      * <p>Node the sobject constrcuted from input stream has limits
      * please see the comment to {@link #of(String, java.io.InputStream)}
      * </p>
@@ -232,12 +239,12 @@ public abstract class SObject implements ISObject {
      * tries to access the Sobject the second time, it will encountered an
      * {@link UnexpectedIOException}. Another limit of this sobject is it
      * does not support {@link org.osgl.storage.ISObject#getLength()} method
-     *
+     * <p>
      * <p>If it needs to construct an SObject without these limits from
      * an input stream, then it shall first read the inputstream into
      * a bytearray, and use the byte array to construct the sobject like
      * following code</p>
-     *
+     * <p>
      * <pre><code>
      * InputStream is = ...
      * ...
@@ -254,6 +261,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * deprecated
+     *
      * @see #of(String, java.io.InputStream)
      */
     @Deprecated
@@ -264,7 +272,7 @@ public abstract class SObject implements ISObject {
     /**
      * Construct a sobject with key, input stream and attributes specified in a
      * {@link java.util.Map}.
-     *
+     * <p>
      * <p>Node the sobject constrcuted from input stream has limits
      * please see the comment to {@link #of(String, java.io.InputStream)}
      * </p>
@@ -279,6 +287,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * deprecated
+     *
      * @see #of(String, java.io.InputStream, java.util.Map)
      */
     @Deprecated
@@ -289,14 +298,14 @@ public abstract class SObject implements ISObject {
     /**
      * Construct a sobject with key, input stream and attributes specified in a
      * sequence like key1, val1, key2, val2, ...
-     *
+     * <p>
      * <p>Node the sobject constrcuted from input stream has limits
      * please see the comment to {@link #of(String, java.io.InputStream)}
      * </p>
      *
      * @see #of(String, java.io.InputStream)
      */
-    public static SObject of(String key, InputStream is, String ... attrs) {
+    public static SObject of(String key, InputStream is, String... attrs) {
         SObject sobj = of(key, is);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
@@ -305,10 +314,11 @@ public abstract class SObject implements ISObject {
 
     /**
      * deprecated
+     *
      * @see #of(String, java.io.File, String...)
      */
     @Deprecated
-    public static SObject valueOf(String key, InputStream is, String ... attrs) {
+    public static SObject valueOf(String key, InputStream is, String... attrs) {
         return of(key, is, attrs);
     }
 
@@ -333,6 +343,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, String)
      */
     @Deprecated
@@ -352,6 +363,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, String, java.util.Map)
      */
     @Deprecated
@@ -365,7 +377,7 @@ public abstract class SObject implements ISObject {
      *
      * @see #of(String, String, java.util.Map)
      */
-    public static SObject of(String key, String content, String ... attrs) {
+    public static SObject of(String key, String content, String... attrs) {
         SObject sobj = of(key, content);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
@@ -374,10 +386,11 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, String, String...)
      */
     @Deprecated
-    public static SObject valueOf(String key, String content, String ... attrs) {
+    public static SObject valueOf(String key, String content, String... attrs) {
         return of(key, content, attrs);
     }
 
@@ -394,6 +407,7 @@ public abstract class SObject implements ISObject {
     /**
      * Construct an sobject with specified key and content
      * in byte array
+     *
      * @see #of(String, byte[], java.util.Map)
      */
     public static SObject of(String key, byte[] buf) {
@@ -402,6 +416,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, byte[])
      */
     @Deprecated
@@ -423,6 +438,7 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, byte[], java.util.Map)
      */
     @Deprecated
@@ -433,9 +449,10 @@ public abstract class SObject implements ISObject {
     /**
      * Construct an sobject with specified key, content in byte array and
      * attributes in sequence of key1, val1, key1, val2, ...
+     *
      * @see #of(String, byte[], java.util.Map)
      */
-    public static SObject of(String key, byte[] buf, String ... attrs) {
+    public static SObject of(String key, byte[] buf, String... attrs) {
         SObject sobj = of(key, buf);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
@@ -444,10 +461,11 @@ public abstract class SObject implements ISObject {
 
     /**
      * Deprecated
+     *
      * @see #of(String, byte[], String...)
      */
     @Deprecated
-    public static SObject valueOf(String key, byte[] buf, String ... attrs) {
+    public static SObject valueOf(String key, byte[] buf, String... attrs) {
         return of(key, buf, attrs);
     }
 
@@ -460,14 +478,14 @@ public abstract class SObject implements ISObject {
     public static SObject lazyLoad(String key, IStorageService ss) {
         return new LazyLoadSObject(key, ss);
     }
-    
+
     public static SObject lazyLoad(String key, IStorageService ss, Map<String, String> conf) {
         SObject sobj = lazyLoad(key, ss);
         sobj.setAttributes(conf);
         return sobj;
     }
 
-    public static SObject lazyLoad(String key, IStorageService ss, String ... attrs) {
+    public static SObject lazyLoad(String key, IStorageService ss, String... attrs) {
         SObject sobj = lazyLoad(key, ss);
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
@@ -611,7 +629,7 @@ public abstract class SObject implements ISObject {
             E.NPE(buf);
             buf_ = buf;
         }
-        
+
         @Override
         public byte[] asByteArray() {
             int len = buf_.length;

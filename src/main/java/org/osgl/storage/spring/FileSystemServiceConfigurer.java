@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.osgl.storage.IStorageService.CONF_KEY_GEN;
+
 /**
  * Created by luog on 3/01/14.
  */
@@ -31,9 +33,10 @@ public class FileSystemServiceConfigurer extends StorageServiceConfigurerBase im
 
     @Override
     public IStorageService getStorageService() {
-        FileSystemService ss = new FileSystemService(getKeyGenerator());
-        Map<String, String> conf = C.map(FileSystemService.CONF_HOME_DIR, homeDir, FileSystemService.CONF_HOME_URL, homeUrl);
-        ss.configure(conf);
-        return ss;
+        Map<String, String> conf = C.map(
+                FileSystemService.CONF_HOME_DIR, homeDir,
+                FileSystemService.CONF_HOME_URL, homeUrl,
+                CONF_KEY_GEN, getKeyGenerator().name());
+        return new FileSystemService(conf);
     }
 }

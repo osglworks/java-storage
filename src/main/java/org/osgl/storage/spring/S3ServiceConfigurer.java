@@ -2,17 +2,14 @@ package org.osgl.storage.spring;
 
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.impl.S3Service;
-import static org.osgl.storage.impl.S3Service.*;
 import org.osgl.util.C;
 import org.osgl.util.E;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Created by luog on 3/01/14.
- */
+import static org.osgl.storage.impl.S3Service.*;
+
 @Component
 public class S3ServiceConfigurer extends StorageServiceConfigurerBase implements StorageServiceConfigurer {
 
@@ -59,14 +56,13 @@ public class S3ServiceConfigurer extends StorageServiceConfigurerBase implements
 
     @Override
     public IStorageService getStorageService() {
-        S3Service ss = new S3Service(getKeyGenerator());
         Map<String, String> conf = C.map(CONF_KEY_ID, awsKeyId,
-            CONF_KEY_SECRET, awsKeySecret,
-            CONF_DEF_STORAGE_CLASS, defStorageClass,
-            CONF_BUCKET, bucket,
-            CONF_GET_META_ONLY, getMetaOnly,
-            CONF_GET_NO_GET, noGet);
-        ss.configure(conf);
-        return ss;
+                CONF_KEY_SECRET, awsKeySecret,
+                CONF_DEF_STORAGE_CLASS, defStorageClass,
+                CONF_BUCKET, bucket,
+                CONF_GET_META_ONLY, getMetaOnly,
+                CONF_GET_NO_GET, noGet,
+                CONF_KEY_GEN, getKeyGenerator().name());
+        return new S3Service(conf);
     }
 }

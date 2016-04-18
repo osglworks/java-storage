@@ -29,8 +29,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Represent an item stored in an <code>IStorageService</code> 
- * 
+ * Represent an item stored in an <code>IStorageService</code>
+ *
  * @author greenl
  */
 public interface ISObject extends Serializable {
@@ -61,6 +61,11 @@ public interface ISObject extends Serializable {
     public static final String ATTR_URL = "url";
 
     /**
+     * Store the content length
+     */
+    public static final String ATTR_CONTENT_LENGTH = "length";
+
+    /**
      * @return key of this object
      */
     String getKey();
@@ -69,17 +74,18 @@ public interface ISObject extends Serializable {
      * @return length of the object
      */
     long getLength();
-    
-    /** 
-     * Return attribute associated with this storage object by key. If there is 
+
+    /**
+     * Return attribute associated with this storage object by key. If there is
      * no such attribute found then <code>null</code> is returned
-     * 
+     *
      * @return the attribute if found or <code>null</code> if not found
      */
     String getAttribute(String key);
 
     /**
-     * Set an attribute to the storage object associated by key specified. 
+     * Set an attribute to the storage object associated by key specified.
+     *
      * @param key
      * @param val
      */
@@ -87,6 +93,7 @@ public interface ISObject extends Serializable {
 
     /**
      * Set attributes to the storage object
+     *
      * @param attrs
      * @return the object with attributes set
      */
@@ -103,8 +110,8 @@ public interface ISObject extends Serializable {
     Map<String, String> getAttributes();
 
     /**
-     * Is content is empty 
-     * 
+     * Is content is empty
+     *
      * @return
      */
     public boolean isEmpty();
@@ -112,45 +119,52 @@ public interface ISObject extends Serializable {
     /**
      * Is this storage object valid. A storage object is not valid
      * if the file/input stream is not readable
-     * 
+     *
      * @return
      */
     public boolean isValid();
 
     /**
-     * Return previous exception that cause the sobject invalid 
-     * 
+     * Return previous exception that cause the sobject invalid
+     *
      * @return
      */
     public Throwable getException();
 
-   /**
-    * @return the the stuff content as an file
-    */
-   File asFile() throws UnexpectedIOException;
-   /**
-    * @return the stuff content as a string
-    */
-   String asString() throws UnexpectedIOException;
+    /**
+     * @return the the stuff content as an file
+     */
+    File asFile() throws UnexpectedIOException;
+
+    /**
+     * @return the stuff content as a string
+     */
+    String asString() throws UnexpectedIOException;
 
     /**
      * @return the stuff content as a string using the charset to encode
      */
-   String asString(Charset charset) throws UnexpectedIOException;
-   /**
-    * @return the stuff content as a byte array
-    */
-   byte[] asByteArray() throws UnexpectedIOException;
-   /**
-    * @return the stuff content as an input stream
-    */
-   InputStream asInputStream() throws UnexpectedIOException;
+    String asString(Charset charset) throws UnexpectedIOException;
+
+    /**
+     * @return the stuff content as a byte array
+     */
+    byte[] asByteArray() throws UnexpectedIOException;
+
+    /**
+     * Returns an {@link InputStream} connect to the sobject. Note it is
+     * caller's responsibility to close the inputStream
+     *
+     * @return the stuff content as an input stream
+     */
+    InputStream asInputStream() throws UnexpectedIOException;
 
     /**
      * Consume the inputstream of this storage object one time and then close the input stream
+     *
      * @param consumer the consumer function
      */
-   void consumeOnce($.Function<InputStream, ?> consumer) throws UnexpectedIOException;
+    void consumeOnce($.Function<InputStream, ?> consumer) throws UnexpectedIOException;
 
     /**
      * Returns {@code true} if this SObject is {@link org.osgl.storage.impl.SObject.getDumpObject()
