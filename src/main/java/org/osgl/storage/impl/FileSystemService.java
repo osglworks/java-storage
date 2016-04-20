@@ -33,7 +33,7 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     @Deprecated
     public static final String CONF_FS_GET_NO_GET = "storage.fs.get.noGet";
 
-    private File root_ = null;
+    private File root_;
 
     public FileSystemService(Map<String, String> conf) {
         super(conf, FileObject.class);
