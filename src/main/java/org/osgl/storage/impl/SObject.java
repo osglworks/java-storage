@@ -85,6 +85,11 @@ public abstract class SObject implements ISObject {
     }
 
     @Override
+    public String getUrl() {
+        return attrs.get(ATTR_URL);
+    }
+
+    @Override
     public String getAttribute(String key) {
         return attrs.get(key);
     }

@@ -76,6 +76,22 @@ public interface ISObject extends Serializable {
     long getLength();
 
     /**
+     * Returns URL set to this SObject.
+     *
+     * <p>
+     *     Calling to this method shall have the same result as
+     *     calling {@link #getAttribute(String)} using
+     *     {@link ISObject#ATTR_URL}:
+     * </p>
+     *
+     * <pre><code>
+     *     String url = sobj.getAttribute(ISObject.ATTR_URL);
+     * </code></pre>
+     * @return the url to this SObject
+     */
+    String getUrl();
+
+    /**
      * Return attribute associated with this storage object by key. If there is
      * no such attribute found then <code>null</code> is returned
      *
@@ -86,8 +102,8 @@ public interface ISObject extends Serializable {
     /**
      * Set an attribute to the storage object associated by key specified.
      *
-     * @param key
-     * @param val
+     * @param key attribute key
+     * @param val attribute value
      */
     ISObject setAttribute(String key, String val);
 
