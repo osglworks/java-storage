@@ -187,7 +187,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, java.io.File, String...)
      */
     public static SObject of(String key, File file, Map<String, String> attributes) {
-        SObject sobj = of(key, file);
+        SObject sobj = of(key, $.notNull(file));
         sobj.setAttributes(attributes);
         return sobj;
     }
@@ -207,7 +207,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, java.io.File, java.util.Map)
      */
     public static SObject of(String key, File file, String... attrs) {
-        SObject sobj = of(key, file);
+        SObject sobj = of(key, $.notNull(file));
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
@@ -234,7 +234,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, java.io.InputStream)
      */
     public static SObject of(InputStream is) {
-        return of(randomKey(), is);
+        return of(randomKey(), $.notNull(is));
     }
 
     /**
@@ -258,7 +258,7 @@ public abstract class SObject implements ISObject {
      */
     public static SObject of(String key, InputStream is) {
         try {
-            return new InputStreamSObject(key, is);
+            return new InputStreamSObject(key, $.notNull(is));
         } catch (Exception e) {
             return getInvalidObject(key, e);
         }
@@ -343,7 +343,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, String, Map)
      */
     public static SObject of(String key, String content) {
-        return new StringSObject(key, content);
+        return new StringSObject(key, $.notNull(content));
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[])
      */
     public static SObject of(byte[] buf) {
-        return of(randomKey(), buf);
+        return of(randomKey(), $.notNull(buf));
     }
 
     /**
@@ -416,7 +416,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[], java.util.Map)
      */
     public static SObject of(String key, byte[] buf) {
-        return new ByteArraySObject(key, buf);
+        return new ByteArraySObject(key, $.notNull(buf));
     }
 
     /**
@@ -436,7 +436,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[], String...)
      */
     public static SObject of(String key, byte[] buf, Map<String, String> attrs) {
-        SObject sobj = of(key, buf);
+        SObject sobj = of(key, $.notNull(buf));
         sobj.setAttributes(attrs);
         return sobj;
     }
@@ -458,7 +458,7 @@ public abstract class SObject implements ISObject {
      * @see #of(String, byte[], java.util.Map)
      */
     public static SObject of(String key, byte[] buf, String... attrs) {
-        SObject sobj = of(key, buf);
+        SObject sobj = of(key, $.notNull(buf));
         Map<String, String> map = C.map(attrs);
         sobj.setAttributes(map);
         return sobj;
