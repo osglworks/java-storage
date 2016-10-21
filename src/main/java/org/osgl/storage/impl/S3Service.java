@@ -172,7 +172,9 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
     protected void doPut(String fullPath, ISObject stuff, Map<String, String> attrs) {
         ObjectMetadata meta = new ObjectMetadata();
         meta.setContentType(stuff.getAttribute(ISObject.ATTR_CONTENT_TYPE));
-        meta.setContentLength(stuff.getLength());
+        if (!(stuff instanceof SObject.InputStreamSObject)) {
+            meta.setContentLength(stuff.getLength());
+        }
         meta.setUserMetadata(attrs);
 
         PutObjectRequest req = new PutObjectRequest(bucket, fullPath, stuff.asInputStream(), meta);

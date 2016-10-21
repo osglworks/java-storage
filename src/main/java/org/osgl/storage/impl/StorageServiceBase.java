@@ -183,7 +183,9 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         }
 
         Map<String, String> attrs = stuff.getAttributes();
-        attrs.put(ISObject.ATTR_CONTENT_LENGTH, S.string(stuff.getLength()));
+        if (!(stuff instanceof SObject.InputStreamSObject)) {
+            attrs.put(ISObject.ATTR_CONTENT_LENGTH, S.string(stuff.getLength()));
+        }
         doPut(keyWithContextPath(key), stuff, attrs);
         return getFull(key);
     }

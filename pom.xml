@@ -15,6 +15,10 @@
   ~ under the License.
   -->
 <!-- history
+0.7.3-SNAPSHOT
+* Fix issue: UnsupportedException caused by StorageServiceBase.put trying to access sobj.length()
+             when sobj is an instance of InputStreamSObject
+
 0.7.2-SNAPSHOT
 * Update aws to 1.11.31
 * Update azure to 4.4.0
@@ -71,7 +75,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.7.2-SNAPSHOT</version>
+    <version>0.7.3-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>

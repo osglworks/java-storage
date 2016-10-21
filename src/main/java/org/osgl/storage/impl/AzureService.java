@@ -120,7 +120,9 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
     protected void doPut(String fullPath, ISObject stuff, Map<String, String> attrs) {
         try {
             CloudBlockBlob blob = blobContainer.getBlockBlobReference(fullPath);
-            blob.upload(stuff.asInputStream(), stuff.getLength());
+            if (!(stuff instanceof SObject.InputStreamSObject)) {
+                blob.upload(stuff.asInputStream(), stuff.getLength());
+            }
             BlobProperties props = blob.getProperties();
             // content-type contains "-" which is illegal character in C# identifier
             // so we have to remove it from meta map
