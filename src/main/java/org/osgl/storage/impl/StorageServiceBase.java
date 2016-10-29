@@ -7,6 +7,7 @@ import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
 import org.osgl.util.C;
+import org.osgl.util.FastStr;
 import org.osgl.util.S;
 
 import java.io.InputStream;
@@ -55,29 +56,44 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     }
 
     protected void configure(Map<String, String> conf) {
-        if (conf.containsKey(CONF_ID)) {
-            id = conf.get(CONF_ID);
-        } else {
+        configure(conf, "");
+    }
+
+    protected void configure(Map<String, String> conf, String prefix) {
+        if (!prefix.endsWith(".")) {
+            prefix = prefix + ".";
+        }
+        id = val(conf, CONF_ID, prefix);
+        if (S.blank(id)) {
             id = DEFAULT;
         }
-        if (conf.containsKey(CONF_KEY_GEN)) {
-            String s = conf.get(CONF_KEY_GEN);
-            keygen = KeyGenerator.valueOfIgnoreCase(s);
-        } else {
-            keygen = BY_DATE;
-        }
-        if (conf.containsKey(CONF_CONTEXT_PATH)) {
-            String s = conf.get(CONF_CONTEXT_PATH);
-            contextPath = canonicalContextPath(s);
-        } else {
-            contextPath = "";
-        }
 
-        staticWebEndPoint = conf.get(CONF_STATIC_WEB_ENDPOINT);
-        loadMetaOnly = Boolean.parseBoolean(getConfValue(conf, CONF_GET_META_ONLY, "false"));
-        noGet = Boolean.parseBoolean(getConfValue(conf, CONF_GET_NO_GET, "false"));
+        String s = val(conf, CONF_KEY_GEN, prefix);
+        keygen = S.blank(s) ? BY_DATE : KeyGenerator.valueOfIgnoreCase(s);
+
+        s = val(conf, CONF_CONTEXT_PATH, prefix);
+        contextPath = S.blank(s) ? "" : canonicalContextPath(s);
+
+        staticWebEndPoint = val(conf, CONF_STATIC_WEB_ENDPOINT, prefix);
+
+        s = val(conf, CONF_GET_META_ONLY, prefix);
+        loadMetaOnly = Boolean.parseBoolean(S.blank(s) ? "false" : s);
+
+        s = val(conf, CONF_GET_NO_GET, prefix);
+        noGet = Boolean.parseBoolean(S.blank(s) ? "false" : s);
 
         this.conf.putAll(conf);
+    }
+
+    private String val(Map<String, String> conf, String key, String prefix) {
+        String val = conf.get(key);
+        if (S.blank(val)) {
+            if (key.startsWith("storage.")) {
+                key = FastStr.of(key).insert(8, prefix).toString();
+            }
+            val = conf.get(new StringBuilder(prefix).append(".").append(key).toString());
+        }
+        return val;
     }
 
     @Override

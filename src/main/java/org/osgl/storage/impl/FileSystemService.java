@@ -48,7 +48,7 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
         if (!conf.containsKey(CONF_GET_NO_GET) && conf.containsKey(CONF_FS_GET_NO_GET)) {
             conf.put(CONF_GET_NO_GET, conf.get(CONF_FS_GET_NO_GET));
         }
-        super.configure(conf);
+        super.configure(conf, "fs");
 
         String s = conf.get(CONF_HOME_DIR);
         root_ = new File(s);
@@ -58,6 +58,7 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
             throw E.invalidConfiguration("Root dir specified is not a directory: %s", root_.getAbsolutePath());
         }
     }
+
 
     @SuppressWarnings("unused")
     public File root() {

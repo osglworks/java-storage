@@ -90,18 +90,7 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
 
     @Override
     protected void configure(Map<String, String> conf) {
-        super.configure(conf);
-        conf = C.newMap(conf);
-        if (!conf.containsKey(CONF_GET_NO_GET) && conf.containsKey(CONF_S3_GET_NO_GET)) {
-            conf.put(CONF_GET_NO_GET, conf.get(CONF_S3_GET_NO_GET));
-        }
-        if (!conf.containsKey(CONF_GET_META_ONLY) && conf.containsKey(CONF_S3_GET_META_ONLY)) {
-            conf.put(CONF_GET_META_ONLY, conf.get(CONF_S3_GET_META_ONLY));
-        }
-        if (!conf.containsKey(CONF_STATIC_WEB_ENDPOINT) && conf.containsKey(CONF_S3_STATIC_WEB_ENDPOINT)) {
-            conf.put(CONF_STATIC_WEB_ENDPOINT, conf.get(CONF_S3_STATIC_WEB_ENDPOINT));
-        }
-        super.configure(conf);
+        super.configure(conf, "s3");
         awsKeyId = conf.get(CONF_KEY_ID);
         awsKeySecret = conf.get(CONF_KEY_SECRET);
         if (null == awsKeySecret || null == awsKeyId) {

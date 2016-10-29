@@ -37,7 +37,7 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
 
     @Override
     protected void configure(Map<String, String> conf) {
-        super.configure(conf);
+        super.configure(conf, "azure");
         String protocol = getConfValue(conf, CONF_PROTOCOL, "");
         String accountKey = getConfValue(conf, CONF_ACCOUNT_KEY, "");
         this.accountName = getConfValue(conf, CONF_ACCOUNT_NAME, "");
