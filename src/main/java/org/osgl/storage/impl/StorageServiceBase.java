@@ -91,7 +91,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
             if (key.startsWith("storage.")) {
                 key = FastStr.of(key).insert(8, prefix).toString();
             }
-            val = conf.get(new StringBuilder(prefix).append(".").append(key).toString());
+            val = conf.get(key);
         }
         return val;
     }
