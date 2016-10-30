@@ -110,6 +110,13 @@ public interface IStorageService {
     ISObject put(String key, ISObject stuff) throws UnexpectedIOException;
 
     /**
+     * Report if a {@link ISObject storage object} is managed by this service
+     * @param sobj the sobject
+     * @return `true` if the sobject is managed by this service
+     */
+    boolean isManaged(ISObject sobj);
+
+    /**
      * Remove the file from the storage by key and return it to caller.
      *
      * @param key
@@ -124,6 +131,12 @@ public interface IStorageService {
      * @return the context path
      */
     String getContextPath();
+
+    /**
+     * Return the static web endpoint configured
+     * @return the configured static web endpoint
+     */
+    String getStaticWebEndpoint();
 
     /**
      * Return the URL to access a stored resource by key

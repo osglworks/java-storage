@@ -38,7 +38,8 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     public static final String CONF_STATIC_WEB_ENDPOINT = "storage.staticWebEndpoint";
 
 
-    private String staticWebEndPoint = null;
+    private String staticWebEndpoint = null;
+    private boolean staticWebEndpointIsAbsolute = false;
     private boolean loadMetaOnly = false;
     private boolean noGet = false;
 
@@ -74,7 +75,19 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         s = val(conf, CONF_CONTEXT_PATH, prefix);
         contextPath = S.blank(s) ? "" : canonicalContextPath(s);
 
-        staticWebEndPoint = val(conf, CONF_STATIC_WEB_ENDPOINT, prefix);
+        staticWebEndpoint = val(conf, CONF_STATIC_WEB_ENDPOINT, prefix);
+        if (null != staticWebEndpoint) {
+            if (staticWebEndpoint.endsWith("/")) {
+                // strip off the last "/"
+                staticWebEndpoint = staticWebEndpoint.substring(0, staticWebEndpoint.length() - 1);
+            }
+            staticWebEndpointIsAbsolute = staticWebEndpoint.startsWith("http") || staticWebEndpoint.startsWith("//");
+            if (!staticWebEndpointIsAbsolute) {
+                if (staticWebEndpoint.startsWith("/")) {
+                    staticWebEndpoint = staticWebEndpoint.substring(1);
+                }
+            }
+        }
 
         s = val(conf, CONF_GET_META_ONLY, prefix);
         loadMetaOnly = Boolean.parseBoolean(S.blank(s) ? "false" : s);
@@ -131,6 +144,11 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     @Override
     public String getContextPath() {
         return contextPath;
+    }
+
+    @Override
+    public String getStaticWebEndpoint() {
+        return staticWebEndpoint;
     }
 
     static String canonicalContextPath(String path) {
@@ -207,17 +225,29 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     }
 
     @Override
+    public boolean isManaged(ISObject sobj) {
+        return S.eq(sobj.getAttribute(ISObject.ATTR_SS_ID), id()) && S.eq(sobj.getAttribute(ISObject.ATTR_SS_CTX), contextPath());
+    }
+
+    @Override
     public String getUrl(String key) {
-        if (null == staticWebEndPoint) {
+        if (null == staticWebEndpoint) {
             return null;
         }
-        return "//" + staticWebEndPoint + "/" + keyWithContextPath(key);
+        if (staticWebEndpointIsAbsolute) {
+            return new StringBuilder(staticWebEndpoint).append("/").append(keyWithContextPath(key)).toString();
+        } else {
+            return new StringBuilder("/").append(staticWebEndpoint).append("/").append(keyWithContextPath(key)).toString();
+        }
     }
 
     protected final IStorageService createSubFolder(String path) {
         StorageServiceBase subFolder = newService(conf);
         subFolder.keygen = this.keygen;
         subFolder.contextPath = keyWithContextPath(path);
+        if (S.notBlank(this.staticWebEndpoint)) {
+            subFolder.staticWebEndpoint = new StringBuilder(this.staticWebEndpoint).append("/").append(path).toString();
+        }
         return subFolder;
     }
 
@@ -255,7 +285,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     private void setDefAttributes(String key, Map<String, String> map) {
         map.put(ISObject.ATTR_SS_ID, id());
         map.put(ISObject.ATTR_SS_CTX, contextPath());
-        if (null != staticWebEndPoint) {
+        if (null != staticWebEndpoint) {
             map.put(ISObject.ATTR_URL, getUrl(key));
         }
     }
