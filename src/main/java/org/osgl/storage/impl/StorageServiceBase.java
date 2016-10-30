@@ -217,11 +217,22 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         }
 
         Map<String, String> attrs = stuff.getAttributes();
+        removeRuntimeAttributes(attrs);
         if (!(stuff instanceof SObject.InputStreamSObject)) {
-            attrs.put(ISObject.ATTR_CONTENT_LENGTH, S.string(stuff.getLength()));
+            long len = stuff.getLength();
+            if (0L < len) {
+                attrs.put(ISObject.ATTR_CONTENT_LENGTH, S.string(len));
+            }
         }
         doPut(keyWithContextPath(key), stuff, attrs);
         return getFull(key);
+    }
+
+    // Runtime attributes are added by storage engine when loading the SObject
+    private void removeRuntimeAttributes(Map<String, String> attrs) {
+        attrs.remove(ISObject.ATTR_SS_ID);
+        attrs.remove(ISObject.ATTR_URL);
+        attrs.remove(ISObject.ATTR_SS_CTX);
     }
 
     @Override
