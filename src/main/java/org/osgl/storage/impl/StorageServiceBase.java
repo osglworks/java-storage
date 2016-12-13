@@ -246,9 +246,9 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
             return null;
         }
         if (staticWebEndpointIsAbsolute) {
-            return new StringBuilder(staticWebEndpoint).append("/").append(keyWithContextPath(key)).toString();
+            return new StringBuilder(staticWebEndpoint).append("/").append(key).toString();
         } else {
-            return new StringBuilder("/").append(staticWebEndpoint).append("/").append(keyWithContextPath(key)).toString();
+            return new StringBuilder("/").append(staticWebEndpoint).append("/").append(key).toString();
         }
     }
 
