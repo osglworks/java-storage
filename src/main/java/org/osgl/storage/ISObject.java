@@ -128,7 +128,7 @@ public interface ISObject extends Serializable {
     /**
      * Is content is empty
      *
-     * @return
+     * @return if the instance is empty
      */
     public boolean isEmpty();
 
@@ -136,14 +136,14 @@ public interface ISObject extends Serializable {
      * Is this storage object valid. A storage object is not valid
      * if the file/input stream is not readable
      *
-     * @return
+     * @return true if this instance is valid or false otherwise
      */
     public boolean isValid();
 
     /**
      * Return previous exception that cause the sobject invalid
      *
-     * @return
+     * @return the previous exception
      */
     public Throwable getException();
 
@@ -183,8 +183,9 @@ public interface ISObject extends Serializable {
     void consumeOnce($.Function<InputStream, ?> consumer) throws UnexpectedIOException;
 
     /**
-     * Returns {@code true} if this SObject is {@link org.osgl.storage.impl.SObject.getDumpObject()
-     * dumb object}
+     * Returns {@code true} if this SObject is dumb
+     *
+     * @return {@code true} if this instance is dumb
      */
     boolean isDumb();
 
