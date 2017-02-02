@@ -15,6 +15,10 @@
   ~ under the License.
   -->
 <!-- history
+0.8.0-SNAPSHOT
+* update tool to 0.10.0
+* update logging to 0.7.0
+
 0.7.3-SNAPSHOT
 * Fix issue: UnsupportedException caused by StorageServiceBase.put trying to access sobj.length()
              when sobj is an instance of InputStreamSObject
@@ -75,7 +79,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.7.4-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
@@ -157,14 +161,8 @@
 
         <dependency>
             <groupId>org.osgl</groupId>
-            <artifactId>osgl-tool</artifactId>
-            <version>0.9.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>0.6.0</version>
+            <version>[0.7.0-SNAPSHOT,)</version>
         </dependency>
 
         <dependency>
