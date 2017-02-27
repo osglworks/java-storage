@@ -79,7 +79,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.8.0-yb-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
@@ -162,7 +162,7 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>[0.7.0-SNAPSHOT,)</version>
+            <version>0.7.0-yb-SNAPSHOT</version>
         </dependency>
 
         <dependency>
