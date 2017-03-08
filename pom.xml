@@ -15,6 +15,9 @@
   ~ under the License.
   -->
 <!-- history
+1.0.0
+* baseline from 0.8
+
 0.8.0-SNAPSHOT
 * update tool to 0.10.0
 * update logging to 0.7.0
@@ -79,7 +82,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
@@ -103,6 +106,9 @@
 
         <maven.test.skip>false</maven.test.skip>
         <spring.version>3.2.6.RELEASE</spring.version>
+        <osgl-logging.version>[1.0.0, 2.0.0)</osgl-logging.version>
+        <aws-sdk.version>[1.11.100, 2.0.0)</aws-sdk.version>
+        <azure-storage.version>[5.0.0, 6.0.0)</azure-storage.version>
     </properties>
 
     <licenses>
@@ -140,8 +146,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                     <debuglevel>lines,vars,source</debuglevel>
                 </configuration>
@@ -162,7 +168,7 @@
         <dependency>
             <groupId>org.osgl</groupId>
             <artifactId>osgl-logging</artifactId>
-            <version>[0.7.0-SNAPSHOT,)</version>
+            <version>${osgl-logging.version}</version>
         </dependency>
 
         <dependency>
@@ -184,7 +190,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.31</version>
+            <version>${aws-sdk.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -192,7 +198,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-storage</artifactId>
-            <version>4.4.0</version>
+            <version>${azure-storage.version}</version>
             <scope>provided</scope>
         </dependency>
 
