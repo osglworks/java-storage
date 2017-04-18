@@ -23,7 +23,6 @@ import org.osgl.util.E;
 import org.osgl.util.S;
 
 import java.util.Calendar;
-import java.util.UUID;
 
 /**
  * Generate or decorate storage object key. There are three types of key generator:
@@ -62,9 +61,9 @@ public enum KeyGenerator {
 
     protected abstract String tmpl();
 
-    public String getKey(String name) {
+    public String getKey(String name, KeyNameProvider keyNameProvider) {
         if (S.blank(name)) {
-            name = UUID.randomUUID().toString();
+            name = keyNameProvider.newKeyName();
         }
         String tmpl = tmpl();
         if (S.blank(tmpl)) {
@@ -74,8 +73,8 @@ public enum KeyGenerator {
         }
     }
 
-    public String getKey() {
-        return getKey(null);
+    public String getKey(KeyNameProvider keyNameProvider) {
+        return getKey(null, keyNameProvider);
     }
 
     public static KeyGenerator valueOfIgnoreCase(String s) {
@@ -87,7 +86,7 @@ public enum KeyGenerator {
         } else if (PLAIN.name().equalsIgnoreCase(s)) {
             return PLAIN;
         }
-        throw E.invalidArg("unknown KeyGenerator name: %s", s);
+        return null;
     }
 
 }

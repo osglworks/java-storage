@@ -6,6 +6,7 @@ import org.osgl.logging.Logger;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
+import org.osgl.storage.KeyNameProvider;
 import org.osgl.util.C;
 import org.osgl.util.FastStr;
 import org.osgl.util.S;
@@ -37,11 +38,23 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
      */
     public static final String CONF_STATIC_WEB_ENDPOINT = "storage.staticWebEndpoint";
 
+    /**
+     * Whether it shall ignore the suffix in the key or not
+     */
+    public static final String CONF_STORE_SUFFIX = "storage.storeSuffix";
+
+    /**
+     * User supplied {@link KeyNameProvider}
+     */
+    public static final String CONF_KEY_NAME_PROVIDER = "storage.keyNameProvider";
+
 
     private String staticWebEndpoint = null;
     private boolean staticWebEndpointIsAbsolute = false;
     private boolean loadMetaOnly = false;
     private boolean noGet = false;
+    private boolean storeSuffix = true;
+    private KeyNameProvider keyNameProvider = KeyNameProvider.DEF_PROVIDER;
 
 
     private Class<SOBJ_TYPE> sobjType;
@@ -69,10 +82,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
             id = DEFAULT;
         }
 
-        String s = val(conf, CONF_KEY_GEN, prefix);
-        keygen = S.blank(s) ? BY_DATE : KeyGenerator.valueOfIgnoreCase(s);
-
-        s = val(conf, CONF_CONTEXT_PATH, prefix);
+        String s = val(conf, CONF_CONTEXT_PATH, prefix);
         contextPath = S.blank(s) ? "" : canonicalContextPath(s);
 
         staticWebEndpoint = val(conf, CONF_STATIC_WEB_ENDPOINT, prefix);
@@ -95,7 +105,40 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         s = val(conf, CONF_GET_NO_GET, prefix);
         noGet = Boolean.parseBoolean(S.blank(s) ? "false" : s);
 
+        s = val(conf, CONF_STORE_SUFFIX, prefix);
+        storeSuffix = Boolean.parseBoolean(S.blank(s) ? "true" : s);
+
+        s = val(conf, CONF_KEY_NAME_PROVIDER, prefix);
+        if (S.notBlank(s)) {
+            keyNameProvider = $.newInstance(s);
+        }
+
+        s = val(conf, CONF_KEY_GEN, prefix);
+        keygen = S.blank(s) ? BY_DATE : KeyGenerator.valueOfIgnoreCase(s);
+        if (null == keygen) {
+            keygen = $.newInstance(s);
+        }
+
+
         this.conf.putAll(conf);
+    }
+
+    /**
+     * Allow framework to set the {@link KeyNameProvider} directly
+     *
+     * @param keyNameProvider the key name provider instance
+     */
+    public void setKeyNameProvider(KeyNameProvider keyNameProvider) {
+        this.keyNameProvider = $.notNull(keyNameProvider);
+    }
+
+    /**
+     * Allow framework to set the {@link KeyGenerator} directly
+     *
+     * @param keygen the key generator instance
+     */
+    public void setKeyGenerator(KeyGenerator keygen) {
+        this.keygen = $.notNull(keygen);
     }
 
     private String val(Map<String, String> conf, String key, String prefix) {
@@ -119,14 +162,23 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         return getContextPath();
     }
 
+    /**
+     * Returns the full path key from the key name
+     * @param keyName the key name (which does not contains the hierarchical path)
+     * @return the full path key
+     */
     @Override
-    public String getKey(String key) {
-        return keygen.getKey(key);
+    public String getKey(String keyName) {
+        return keygen.getKey(keyName, keyNameProvider);
     }
 
+    /**
+     * Returns a full path key with a generated unique key name
+     * @return a full path key
+     */
     @Override
     public String getKey() {
-        return keygen.getKey();
+        return keygen.getKey(keyNameProvider);
     }
 
     @Override
@@ -212,7 +264,21 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
 
     @Override
     public ISObject put(String key, ISObject stuff) {
-        if (S.eq(key, stuff.getKey()) && isManagedObject(stuff)) {
+        String processedKey = key;
+        if (storeSuffix) {
+            String originalFilename = stuff.getAttribute(ISObject.ATTR_FILE_NAME);
+            if (null != originalFilename) {
+                String suffix = S.afterLast(originalFilename, ".");
+                if (S.notBlank(suffix)) {
+                    suffix = S.concat(".", suffix);
+                    if (!key.endsWith(suffix)) {
+                        processedKey = S.concat(key, suffix);
+                    }
+                }
+            }
+        }
+
+        if ((S.eq(key, stuff.getKey()) || S.eq(processedKey, stuff.getKey()) && isManagedObject(stuff))) {
             return stuff;
         }
 
@@ -224,8 +290,8 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
                 attrs.put(ISObject.ATTR_CONTENT_LENGTH, S.string(len));
             }
         }
-        doPut(keyWithContextPath(key), stuff, attrs);
-        return getFull(key);
+        doPut(keyWithContextPath(processedKey), stuff, attrs);
+        return getFull(processedKey);
     }
 
     // Runtime attributes are added by storage engine when loading the SObject
@@ -364,4 +430,5 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     protected abstract ISObject newSObject(String key);
 
     protected abstract StorageServiceBase newService(Map<String, String> conf);
+
 }

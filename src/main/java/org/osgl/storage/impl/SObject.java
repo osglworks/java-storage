@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public abstract class SObject implements ISObject {
     private String key;
-    private Map<String, String> attrs = new HashMap<String, String>();
+    private Map<String, String> attrs = new HashMap<>();
     private boolean valid = true;
     private Throwable cause = null;
 
@@ -141,6 +141,17 @@ public abstract class SObject implements ISObject {
         } finally {
             IO.close(is);
         }
+    }
+
+    protected final String suffix() {
+        String originalFilename = getAttribute(ATTR_FILE_NAME);
+        if (S.notBlank(originalFilename)) {
+            int pos = originalFilename.lastIndexOf(".");
+            if (pos > -1) {
+                return originalFilename.substring(pos, originalFilename.length());
+            }
+        }
+        return "";
     }
 
     /**
@@ -497,9 +508,9 @@ public abstract class SObject implements ISObject {
         return sobj;
     }
 
-    private static File createTempFile() {
+    private static File createTempFile(String suffix) {
         try {
-            return File.createTempFile("sobj_", ".tmp");
+            return File.createTempFile("sobj_", suffix);
         } catch (IOException e) {
             throw E.ioException(e);
         }
@@ -521,7 +532,7 @@ public abstract class SObject implements ISObject {
 
         @Override
         public File asFile() {
-            File tmpFile = createTempFile();
+            File tmpFile = createTempFile(suffix());
             IO.writeContent(s_, tmpFile);
             return tmpFile;
         }
@@ -645,7 +656,7 @@ public abstract class SObject implements ISObject {
 
         @Override
         public File asFile() {
-            File tmpFile = createTempFile();
+            File tmpFile = createTempFile(suffix());
             IO.write(buf_, tmpFile);
             return tmpFile;
         }
@@ -687,7 +698,7 @@ public abstract class SObject implements ISObject {
 
         @Override
         public File asFile() {
-            File tmpFile = createTempFile();
+            File tmpFile = createTempFile(suffix());
             IO.write(is_, tmpFile);
             return tmpFile;
         }
