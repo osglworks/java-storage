@@ -16,6 +16,9 @@
   -->
 <!-- history
 
+1.1.1
+* #10 NPE triggered when loading storage object without attr file
+
 1.1.0
 * #8 Allow store sobject with suffix attached to the key
 * #9 Allow plugin key name provider and key generator

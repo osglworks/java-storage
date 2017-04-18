@@ -72,7 +72,7 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
 
     @Override
     protected Map<String, String> doGetMeta(String fullPath) {
-        InputStream is = doOperate(fullPath, null, GET_INPUT_STREAM);
+        InputStream is = doOperate(fullPath, null, SAFE_GET_INPUT_STREAM);
         Properties p = new Properties();
         try {
             p.load(is);
@@ -135,6 +135,13 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     protected StorageServiceBase newService(Map<String, String> conf) {
         return new FileSystemService(conf);
     }
+
+    private static final $.Transformer<File, InputStream> SAFE_GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
+        @Override
+        public InputStream transform(File file) {
+            return file.canRead() ? IO.is(file) : IO.is();
+        }
+    };
 
     private static final $.Transformer<File, InputStream> GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
         @Override
