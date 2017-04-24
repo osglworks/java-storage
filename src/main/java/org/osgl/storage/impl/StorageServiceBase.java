@@ -14,7 +14,7 @@ import org.osgl.util.S;
 import java.io.InputStream;
 import java.util.Map;
 
-import static org.osgl.storage.KeyGenerator.BY_DATE;
+import static org.osgl.storage.KeyGenerator.Predefined.BY_DATE;
 
 /**
  * The implementation base of {@link IStorageService}
@@ -114,11 +114,10 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
         }
 
         s = val(conf, CONF_KEY_GEN, prefix);
-        keygen = S.blank(s) ? BY_DATE : KeyGenerator.valueOfIgnoreCase(s);
+        keygen = S.blank(s) ? BY_DATE : KeyGenerator.Predefined.valueOfIgnoreCase(s);
         if (null == keygen) {
             keygen = $.newInstance(s);
         }
-
 
         this.conf.putAll(conf);
     }
@@ -178,7 +177,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
      */
     @Override
     public String getKey() {
-        return keygen.getKey(keyNameProvider);
+        return keygen.getKey(null, keyNameProvider);
     }
 
     @Override

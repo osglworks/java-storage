@@ -15,6 +15,8 @@
   ~ under the License.
   -->
 <!-- history
+1.2.0
+* #11 Enable user defined `KeyGenerator`
 
 1.1.1
 * #10 NPE triggered when loading storage object without attr file
@@ -93,7 +95,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>

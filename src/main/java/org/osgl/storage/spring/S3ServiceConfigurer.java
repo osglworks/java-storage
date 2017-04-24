@@ -1,6 +1,7 @@
 package org.osgl.storage.spring;
 
 import org.osgl.storage.IStorageService;
+import org.osgl.storage.KeyGenerator;
 import org.osgl.storage.impl.S3Service;
 import org.osgl.util.C;
 import org.osgl.util.E;
@@ -61,8 +62,12 @@ public class S3ServiceConfigurer extends StorageServiceConfigurerBase implements
                 CONF_DEF_STORAGE_CLASS, defStorageClass,
                 CONF_BUCKET, bucket,
                 CONF_GET_META_ONLY, getMetaOnly,
-                CONF_GET_NO_GET, noGet,
-                CONF_KEY_GEN, getKeyGenerator().name());
-        return new S3Service(conf);
+                CONF_GET_NO_GET, noGet);
+        S3Service ss = new S3Service(conf);
+        KeyGenerator keyGenerator = getKeyGenerator();
+        if (null != keyGenerator) {
+            ss.setKeyGenerator(keyGenerator);
+        }
+        return ss;
     }
 }

@@ -1,6 +1,7 @@
 package org.osgl.storage.spring;
 
 import org.osgl.storage.IStorageService;
+import org.osgl.storage.KeyGenerator;
 import org.osgl.storage.impl.FileSystemService;
 import org.osgl.util.C;
 import org.osgl.util.E;
@@ -10,10 +11,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.osgl.storage.IStorageService.CONF_KEY_GEN;
-
 /**
- * Created by luog on 3/01/14.
+ * A file system based {@link IStorageService} implementation
  */
 @Component
 public class FileSystemServiceConfigurer extends StorageServiceConfigurerBase implements StorageServiceConfigurer {
@@ -35,8 +34,12 @@ public class FileSystemServiceConfigurer extends StorageServiceConfigurerBase im
     public IStorageService getStorageService() {
         Map<String, String> conf = C.map(
                 FileSystemService.CONF_HOME_DIR, homeDir,
-                FileSystemService.CONF_HOME_URL, homeUrl,
-                CONF_KEY_GEN, getKeyGenerator().name());
-        return new FileSystemService(conf);
+                FileSystemService.CONF_HOME_URL, homeUrl);
+        FileSystemService ss = new FileSystemService(conf);
+        KeyGenerator keyGenerator = getKeyGenerator();
+        if (null != keyGenerator) {
+            ss.setKeyGenerator(keyGenerator);
+        }
+        return ss;
     }
 }
