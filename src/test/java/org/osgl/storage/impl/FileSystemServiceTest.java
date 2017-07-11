@@ -56,11 +56,17 @@ public class FileSystemServiceTest extends TestBase {
 
     @Test(expected = UnexpectedIOException.class)
     public void testSubFolderRemove() {
-        ISObject obj = fss.put(subFolderPath + "/" + key1, sobj);
+        fss.put(subFolderPath + "/" + key1, sobj);
         subFolder.remove(key1);
-        obj = fss.get(subFolderPath + "/" + key1);
+        ISObject obj = fss.get(subFolderPath + "/" + key1);
         assertNull(obj.getAttribute(ISObject.ATTR_FILE_NAME));
         obj.asByteArray();
+    }
+
+    @Test
+    public void testLoadResource() {
+        ISObject obj = SObject.loadResource("/test.txt");
+        eq("test.txt", obj.getAttribute(ISObject.ATTR_FILE_NAME));
     }
 
 }

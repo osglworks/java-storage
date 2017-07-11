@@ -249,6 +249,28 @@ public abstract class SObject implements ISObject {
     }
 
     /**
+     * Load an sobject from classpath by given url path
+     *
+     * This method will call {@link Class#getResource(String)} method to open
+     * an inputstream to the resource and then construct an SObject with the
+     * inputstream
+     *
+     * @param url the resource url path
+     * @return the sobject instance if loaded successfully or `null` if cannot load resource from the url
+     */
+    public static SObject loadResource(String url) {
+        InputStream is = SObject.class.getResourceAsStream(url);
+        if (null == is) {
+            return null;
+        }
+        String filename = S.afterLast(url, "/");
+        if (S.blank(filename)) {
+            filename = url;
+        }
+        return of(randomKey(), is, ATTR_FILE_NAME, filename);
+    }
+
+    /**
      * Construct an SObject with key and input stream. Note unlike sobject
      * constructed with String, byte array or file, the sobject constructed
      * with input stream can only be read for one time. If the program
