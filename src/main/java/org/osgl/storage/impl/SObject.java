@@ -24,9 +24,9 @@ import org.osgl.$;
 import org.osgl.exception.UnexpectedIOException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
+import org.osgl.storage.util.MimeTypes;
 import org.osgl.util.*;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,18 +60,6 @@ public abstract class SObject implements ISObject {
         SObject sobj = of(key, "");
         sobj.valid = false;
         sobj.cause = cause;
-        return sobj;
-    }
-
-    public static ISObject getDumpObject(String key) {
-        StringSObject sobj = new StringSObject(key, "");
-        sobj.dumb = true;
-        return sobj;
-    }
-
-    public static ISObject getDumpObject(String key, Map<String, String> attrs) {
-        SObject sobj = of(key, "");
-        sobj.setAttrs(attrs);
         return sobj;
     }
 
@@ -174,7 +162,7 @@ public abstract class SObject implements ISObject {
         if (file.canRead() && file.isFile()) {
             SObject sobj = new FileSObject(key, file);
             sobj.setAttribute(ATTR_FILE_NAME, file.getName());
-            sobj.setAttribute(ATTR_CONTENT_TYPE, new MimetypesFileTypeMap().getContentType(file));
+            sobj.setAttribute(ATTR_CONTENT_TYPE, MimeTypes.mimeType(file));
             return sobj;
         } else {
             return getInvalidObject(key, new IOException("File is a directory or not readable"));

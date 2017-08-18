@@ -241,10 +241,12 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     @Override
     public final ISObject get(String key) {
         if (noGet) {
-            return SObject.getDumpObject(key);
+            return createDumbObject(key);
         }
         if (loadMetaOnly) {
-            return SObject.getDumpObject(key, getMeta(key));
+            ISObject obj = createDumbObject(key);
+            obj.setAttributes(getMeta(key));
+            return obj;
         }
         return getFull(key);
     }
@@ -429,5 +431,11 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     protected abstract ISObject newSObject(String key);
 
     protected abstract StorageServiceBase newService(Map<String, String> conf);
+
+    private ISObject createDumbObject(String key) {
+        DumbObject obj = new DumbObject(key);
+        setDefAttributes(obj);
+        return obj;
+    }
 
 }

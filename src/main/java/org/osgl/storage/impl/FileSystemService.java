@@ -84,6 +84,10 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
         return $.cast(p);
     }
 
+    protected File doGetFile(String fullPath) {
+        return doOperate(fullPath, $.F.<File>identity(), null);
+    }
+
     @Override
     protected InputStream doGetInputStream(String fullPath) {
         return doOperate(fullPath, GET_INPUT_STREAM, null);

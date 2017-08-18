@@ -8,11 +8,13 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
-import org.osgl.util.C;
 import org.osgl.util.E;
 import org.osgl.util.S;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,9 +147,9 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
 
     @Override
     protected Map<String, String> doGetMeta(String fullPath) {
-        GetObjectMetadataRequest req = new GetObjectMetadataRequest(bucket, fullPath);
-        ObjectMetadata meta = s3.getObjectMetadata(req);
-        return meta.getUserMetadata();
+        GetObjectTaggingRequest req0 = new GetObjectTaggingRequest(bucket, fullPath);
+        GetObjectTaggingResult resp = s3.getObjectTagging(req0);
+        return tagListToMap(resp.getTagSet());
     }
 
     @Override
@@ -162,17 +164,36 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
         ObjectMetadata meta = new ObjectMetadata();
         meta.setContentType(stuff.getAttribute(ISObject.ATTR_CONTENT_TYPE));
         if (!(stuff instanceof SObject.InputStreamSObject)) {
-            meta.setContentLength(stuff.getLength());
+            long length = stuff.getLength();
+            if (0 < length) {
+                meta.setContentLength(stuff.getLength());
+            }
         }
-        meta.setUserMetadata(attrs);
 
         PutObjectRequest req = new PutObjectRequest(bucket, fullPath, stuff.asInputStream(), meta);
+        req.setTagging(mapToTagList(attrs));
         StorageClass storageClass = StorageClass.valueOfIgnoreCase(attrs.remove(ATTR_STORAGE_CLASS), defStorageClass);
         if (null != storageClass) {
             req.setStorageClass(storageClass.toString());
         }
         req.withCannedAcl(CannedAccessControlList.PublicRead);
         s3.putObject(req);
+    }
+
+    private static ObjectTagging mapToTagList(Map<String, String> map) {
+        List<Tag> list = new ArrayList<>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            list.add(new Tag(entry.getKey(), entry.getValue()));
+        }
+        return new ObjectTagging(list);
+    }
+
+    private static Map<String, String> tagListToMap(List<Tag> tagging) {
+        Map<String, String> map = new HashMap<>();
+        for (Tag tag : tagging) {
+            map.put(tag.getKey(), tag.getValue());
+        }
+        return map;
     }
 
     @Override
