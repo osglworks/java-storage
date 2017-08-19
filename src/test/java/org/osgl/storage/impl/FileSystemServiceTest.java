@@ -2,6 +2,7 @@ package org.osgl.storage.impl;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
@@ -11,6 +12,7 @@ import org.osgl.util.C;
 import static org.osgl.storage.impl.FileSystemService.CONF_HOME_DIR;
 import static org.osgl.storage.impl.FileSystemService.CONF_HOME_URL;
 
+@Ignore
 public class FileSystemServiceTest extends TestBase {
 
     private FileSystemService fss;
