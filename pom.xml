@@ -16,6 +16,9 @@
   -->
 <!-- history
 1.4.0
+* #18 Optimize FileObject implementation
+* #17 Add getFile(String fullPath) protected method into FileSystemService
+* #16 Add getter and setter for filename, contentType on ISObject
 * #15 It cannot determine `.png` file's mime type
 * #14 S3 allow only US-ASCII characters in the meta data
 * #13 DumbObject shall return valid url in getUrl call
@@ -104,7 +107,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
