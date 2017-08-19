@@ -92,6 +92,30 @@ public interface ISObject extends Serializable {
     String getUrl();
 
     /**
+     * Returns {@link #ATTR_FILE_NAME filename} attribute
+     * @return filename
+     */
+    String getFilename();
+
+    /**
+     * Return {@link #ATTR_CONTENT_TYPE content type} attribute
+     * @return content type
+     */
+    String getContentType();
+
+    /**
+     * Set {@link #ATTR_FILE_NAME filename} attribute
+     * @param filename the filename to be set
+     */
+    void setFilename(String filename);
+
+    /**
+     * Set {@link #ATTR_CONTENT_TYPE content type} attribute
+     * @param contentType the content type to be set
+     */
+    void setContentType(String contentType);
+
+    /**
      * Return attribute associated with this storage object by key. If there is
      * no such attribute found then <code>null</code> is returned
      *

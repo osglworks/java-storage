@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public class StorageObject<TYPE extends StorageObject, SVC extends StorageServiceBase<TYPE>> extends SObject {
     protected transient SVC svc;
     private SoftReference<byte[]> cache;
-    private transient SObject buf;
+    protected transient ISObject buf;
 
     StorageObject(String key, SVC svc) {
         super(key);
@@ -36,16 +36,25 @@ public class StorageObject<TYPE extends StorageObject, SVC extends StorageServic
         return 0L;
     }
 
-    private ISObject buf() {
+    protected ISObject buf() {
         if (null == buf) {
             synchronized (this) {
                 if (null == buf) {
-                    buf = SObject.of(read());
-                    buf.setAttributes(getAttributes());
+                    buf = loadBuf();
+                    if (!buf.isValid()) {
+                        this.valid = false;
+                        this.cause = buf.getException();
+                    }
                 }
             }
         }
         return buf;
+    }
+
+    protected ISObject loadBuf() {
+        ISObject sobj = SObject.of(read());
+        sobj.setAttributes(getAttributes());
+        return sobj;
     }
 
     @Override
@@ -84,7 +93,7 @@ public class StorageObject<TYPE extends StorageObject, SVC extends StorageServic
         InputStream is = svc.getInputStream(getKey());
         IO.copy(is, baos);
         byte[] ba = baos.toByteArray();
-        cache = new SoftReference<byte[]>(ba);
+        cache = new SoftReference<>(ba);
         return ba;
     }
 }

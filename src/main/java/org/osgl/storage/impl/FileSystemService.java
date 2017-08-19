@@ -52,13 +52,12 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
 
         String s = conf.get(CONF_HOME_DIR);
         root_ = new File(s);
-        if (!root_.exists() && !root_.mkdir()) {
+        if (!root_.exists() && !root_.mkdirs()) {
             throw E.invalidConfiguration("Cannot create root dir: %s", root_.getAbsolutePath());
         } else if (!root_.isDirectory()) {
             throw E.invalidConfiguration("Root dir specified is not a directory: %s", root_.getAbsolutePath());
         }
     }
-
 
     @SuppressWarnings("unused")
     public File root() {
@@ -93,34 +92,41 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
         return doOperate(fullPath, GET_INPUT_STREAM, null);
     }
 
+    protected File getFile(String fullPath) {
+        fullPath = fullPath.replace('\\', '/');
+        String[] path = fullPath.split("/");
+        int len = path.length;
+        assert len > 0;
+        File folder = root_;
+        for (int i = 0; i < len - 1; ++i) {
+            folder = IO.child(folder, path[i]);
+            if (folder.exists() && !folder.isDirectory()) {
+                throw E.ioException("cannot store the object into storage: %s is not a directory", folder);
+            }
+        }
+        return new File(folder, path[len - 1]);
+    }
+
     private <T> T doOperate(String fullPath, $.Function<File, T> blobOperator, $.Function<File, T> attrOperator) {
         return doOperate(fullPath, blobOperator, attrOperator, false);
     }
 
     private <T> T doOperate(String fullPath, $.Function<File, T> blobOperator, $.Function<File, T> attrOperator, boolean mkdir) {
-        fullPath = fullPath.replace('\\', '/');
-        String[] path = fullPath.split("/");
-        int l = path.length;
-        assert l > 0;
-        File f = root_;
-        for (int i = 0; i < l - 1; ++i) {
-            f = IO.child(f, path[i]);
-            if (mkdir) {
-                if (!f.exists() && !f.mkdir()) {
-                    throw E.ioException("Cannot create directory: %s", f.getAbsolutePath());
-                } else if (!f.isDirectory()) {
-                    throw E.ioException("cannot store the object into storage: %s is not a directory", f);
-                }
+        File file = getFile(fullPath);
+        T retVal;
+        if (mkdir) {
+            File dir = file.getParentFile();
+            if (!dir.exists() && dir.mkdirs()) {
+                throw E.ioException("Cannot create dir: " + dir.getAbsolutePath());
             }
         }
-        T retVal = null;
         if (null != blobOperator) {
-            File fObj = IO.child(f, path[l - 1]);
-            retVal = blobOperator.apply(fObj);
-        }
-        if (null != attrOperator) {
-            File fAttr = IO.child(f, path[l - 1] + ".attr");
+            retVal = blobOperator.apply(file);
+        } else if (null != attrOperator) {
+            File fAttr = new File(file.getParent(), file.getName() + ".attr");
             retVal = attrOperator.apply(fAttr);
+        } else {
+            throw new NullPointerException("both blob operator and attributes operator is null");
         }
         return retVal;
     }

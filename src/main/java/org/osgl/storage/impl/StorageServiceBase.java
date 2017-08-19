@@ -254,7 +254,6 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     @Override
     public final ISObject getFull(String key) {
         ISObject sobj = newSObject(key);
-        setDefAttributes(sobj);
         return sobj;
     }
 

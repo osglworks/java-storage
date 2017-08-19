@@ -41,8 +41,8 @@ import java.util.Map;
 public abstract class SObject implements ISObject {
     private String key;
     private Map<String, String> attrs = new HashMap<>();
-    private boolean valid = true;
-    private Throwable cause = null;
+    protected boolean valid = true;
+    protected Throwable cause = null;
 
     SObject(String key) {
         if (null == key) {
@@ -75,6 +75,28 @@ public abstract class SObject implements ISObject {
     @Override
     public String getUrl() {
         return attrs.get(ATTR_URL);
+    }
+
+    @Override
+    public String getFilename() {
+        return getAttribute(ATTR_FILE_NAME);
+    }
+
+    @Override
+    public String getContentType() {
+        return getAttribute(ATTR_CONTENT_TYPE);
+    }
+
+    @Override
+    public void setFilename(String filename) {
+        E.illegalArgumentIf(S.blank(filename));
+        setAttribute(ATTR_FILE_NAME, filename);
+    }
+
+    @Override
+    public void setContentType(String contentType) {
+        E.illegalArgumentIf(S.blank(contentType));
+        setAttribute(ATTR_CONTENT_TYPE, contentType);
     }
 
     @Override
@@ -163,6 +185,7 @@ public abstract class SObject implements ISObject {
             SObject sobj = new FileSObject(key, file);
             sobj.setAttribute(ATTR_FILE_NAME, file.getName());
             sobj.setAttribute(ATTR_CONTENT_TYPE, MimeTypes.mimeType(file));
+            sobj.setAttribute(ATTR_CONTENT_LENGTH, S.string(file.length()));
             return sobj;
         } else {
             return getInvalidObject(key, new IOException("File is a directory or not readable"));
@@ -431,13 +454,43 @@ public abstract class SObject implements ISObject {
     }
 
     /**
-     * Construct an sobject with specified key and content
-     * in byte array
+     * Construct an sobject with specified key and byte array.
+     *
+     * Note the byte array will be used directly without copying into an new array.
      *
      * @see #of(String, byte[], java.util.Map)
      */
     public static SObject of(String key, byte[] buf) {
         return new ByteArraySObject(key, $.notNull(buf));
+    }
+
+    /**
+     * Construct an SObject with random generated key, byte array and number of bytes
+     * @param buf the source byte array
+     * @param len the number of bytes in the array should be stored in the returing object
+     * @return an SObject as described above
+     */
+    public static SObject of(byte[] buf, int len) {
+        return of(randomKey(), buf, len);
+    }
+
+    /**
+     * Construct an SObject with specified key, byte array and number of bytes
+     * @param key the key
+     * @param buf the source byte array
+     * @param len the number of bytes in the array should be stored in the returing object
+     * @return an SObject as described above
+     */
+    public static SObject of(String key, byte[] buf, int len) {
+        if (len <= 0) {
+            return of(key, new byte[0]);
+        }
+        if (len >= buf.length) {
+            return of(key, buf);
+        }
+        byte[] ba = new byte[len];
+        System.arraycopy(buf, 0, ba, 0, len);
+        return of(key, ba);
     }
 
     /**

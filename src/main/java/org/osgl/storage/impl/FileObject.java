@@ -1,16 +1,22 @@
 package org.osgl.storage.impl;
 
-import org.osgl.exception.UnexpectedIOException;
-
-import java.io.File;
+import org.osgl.storage.ISObject;
 
 class FileObject extends StorageObject<FileObject, FileSystemService> {
+
     FileObject(String key, FileSystemService fileSystemService) {
         super(key, fileSystemService);
+        buf(); // eager load buf
     }
 
     @Override
-    public File asFile() throws UnexpectedIOException {
-        return svc.doGetFile(svc.keyWithContextPath(getKey()));
+    public long getLength() {
+        return buf().getLength();
+    }
+
+    @Override
+    protected ISObject loadBuf() {
+        String fullPath = svc.keyWithContextPath(getKey());
+        return SObject.of(fullPath, svc.getFile(fullPath));
     }
 }
