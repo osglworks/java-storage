@@ -15,6 +15,11 @@
   ~ under the License.
   -->
 <!-- history
+1.4.1
+* #21 It reports `NullPointerException` when trying to load an SObject from persistent storage without attribute file
+* #20 Missing attributes file since 1.4.0
+* #19 "Cannot create dir" on 1.4.0 with FileSystemService
+
 1.4.0
 * #18 Optimize FileObject implementation
 * #17 Add getFile(String fullPath) protected method into FileSystemService
@@ -107,7 +112,7 @@
     <groupId>org.osgl</groupId>
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.1</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
