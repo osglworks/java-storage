@@ -72,6 +72,9 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     @Override
     protected Map<String, String> doGetMeta(String fullPath) {
         InputStream is = doOperate(fullPath, null, SAFE_GET_INPUT_STREAM);
+        if (null == is) {
+            return C.newMap();
+        }
         Properties p = new Properties();
         try {
             p.load(is);
@@ -113,20 +116,23 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
 
     private <T> T doOperate(String fullPath, $.Function<File, T> blobOperator, $.Function<File, T> attrOperator, boolean mkdir) {
         File file = getFile(fullPath);
-        T retVal;
+        T retVal = null;
         if (mkdir) {
             File dir = file.getParentFile();
-            if (!dir.exists() && dir.mkdirs()) {
+            if (!dir.exists() && !dir.mkdirs()) {
                 throw E.ioException("Cannot create dir: " + dir.getAbsolutePath());
             }
         }
         if (null != blobOperator) {
             retVal = blobOperator.apply(file);
-        } else if (null != attrOperator) {
+        }
+        if (null != attrOperator) {
             File fAttr = new File(file.getParent(), file.getName() + ".attr");
-            retVal = attrOperator.apply(fAttr);
-        } else {
-            throw new NullPointerException("both blob operator and attributes operator is null");
+            if (null != retVal) {
+                retVal = attrOperator.apply(fAttr);
+            } else {
+                attrOperator.apply(fAttr);
+            }
         }
         return retVal;
     }
