@@ -1,4 +1,4 @@
-package org.osgl.storage.impl;
+package org.osgl.storage;
 
 /*-
  * #%L
@@ -20,23 +20,13 @@ package org.osgl.storage.impl;
  * #L%
  */
 
-import org.osgl.storage.ISObject;
+import org.junit.Test;
 
-class FileObject extends StorageObject<FileObject, FileSystemService> {
+public class VersionTest extends TestBase {
 
-    FileObject(String key, FileSystemService fileSystemService) {
-        super(key, fileSystemService);
-        buf(); // eager load buf
+    @Test
+    public void versionShallContainsOsglStorage() {
+        yes(ISObject.VERSION.toString().contains("osgl-storage"));
     }
 
-    @Override
-    public long getLength() {
-        return buf().getLength();
-    }
-
-    @Override
-    protected ISObject loadBuf() {
-        String fullPath = svc.keyWithContextPath(getKey());
-        return SObject.of(fullPath, svc.getFile(fullPath));
-    }
 }
