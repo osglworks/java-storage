@@ -42,7 +42,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <scm.url>git@github.com:osglworks/java-unit.git</scm.url>
+        <scm.url>git@github.com:osglworks/java-storage.git</scm.url>
 
         <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
