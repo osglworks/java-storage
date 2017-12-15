@@ -1,5 +1,8 @@
 # OSGL Storage CHANGE LOG 
 
+1.5.0
+* update to osgl-1.5
+
 1.4.2
 * improve maven build process
 * apply osgl-bootstrap versioning
