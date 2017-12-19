@@ -40,8 +40,8 @@ package org.osgl.storage;
  */
 
 import org.osgl.$;
-import org.osgl.bootstrap.Version;
 import org.osgl.exception.UnexpectedIOException;
+import osgl.version.Version;
 
 import java.util.Map;
 
