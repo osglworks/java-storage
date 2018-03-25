@@ -1,5 +1,11 @@
 # OSGL Storage CHANGE LOG 
 
+1.5.1 - 25/Mar/2018
+* update to osgl-1.8.0
+* update aws-sdk to 1.11.301
+* update azure-storage to 7.0.0
+* update spring to 3.2.18.RELEASE
+
 1.5.0
 * update to osgl-1.5
 
