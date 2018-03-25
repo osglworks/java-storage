@@ -1,5 +1,8 @@
 # OSGL Storage CHANGE LOG 
 
+1.5.2 - 25/Mar/2018
+* update osgl-tool to 1.8.1
+
 1.5.1 - 25/Mar/2018
 * update to osgl-1.8.0
 * update aws-sdk to 1.11.301
