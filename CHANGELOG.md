@@ -1,6 +1,6 @@
 # OSGL Storage CHANGE LOG 
 
-1.5.5 - 19/May/2018
+1.6.0 - 19/May/2018
 * update osgl-tool to 1.13.1
     - move SObject, ISObject and IStorageService to osgl-tool
 
