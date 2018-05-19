@@ -24,14 +24,14 @@ import org.osgl.util.C;
 import org.osgl.util.IO;
 import org.osgl.util.S;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
+import javax.activation.MimetypesFileTypeMap;
 
 public class MimeTypes {
     // some common types that are missing from java activation utils
-    private static Map<String, String> commonMimeTypes = C.map(
+    private static Map<String, String> commonMimeTypes = C.Map(
             "pdf", "application/pdf",
             "png", "image/png",
             "bmp", "image/bmp"

@@ -20,6 +20,8 @@ package org.osgl.storage.impl;
  * #L%
  */
 
+import static org.osgl.storage.KeyGenerator.Predefined.BY_DATE;
+
 import org.osgl.$;
 import org.osgl.logging.L;
 import org.osgl.logging.Logger;
@@ -33,8 +35,6 @@ import org.osgl.util.S;
 
 import java.io.InputStream;
 import java.util.Map;
-
-import static org.osgl.storage.KeyGenerator.Predefined.BY_DATE;
 
 /**
  * The implementation base of {@link IStorageService}
@@ -85,7 +85,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     protected Map<String, IStorageService> subFolders = C.newMap();
 
     public StorageServiceBase(Map<String, String> conf, Class<SOBJ_TYPE> sobjType) {
-        this.sobjType = $.notNull(sobjType);
+        this.sobjType = $.requireNotNull(sobjType);
         configure(conf);
     }
 
@@ -148,7 +148,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
      * @param keyNameProvider the key name provider instance
      */
     public void setKeyNameProvider(KeyNameProvider keyNameProvider) {
-        this.keyNameProvider = $.notNull(keyNameProvider);
+        this.keyNameProvider = $.requireNotNull(keyNameProvider);
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
      * @param keygen the key generator instance
      */
     public void setKeyGenerator(KeyGenerator keygen) {
-        this.keygen = $.notNull(keygen);
+        this.keygen = $.requireNotNull(keygen);
     }
 
     private String val(Map<String, String> conf, String key, String prefix) {
@@ -353,7 +353,7 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     }
 
     protected Map<String, String> getMeta(String key, boolean force) {
-        if (noGet && !force) return C.map();
+        if (noGet && !force) return C.Map();
         Map<String, String> map = doGetMeta(keyWithContextPath(key));
         setDefAttributes(key, map);
         return map;

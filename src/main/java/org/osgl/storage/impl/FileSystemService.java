@@ -21,7 +21,6 @@ package org.osgl.storage.impl;
  */
 
 import org.osgl.$;
-import org.osgl.Osgl;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
@@ -175,20 +174,20 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     private static final $.Transformer<File, InputStream> SAFE_GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
         @Override
         public InputStream transform(File file) {
-            return file.canRead() ? IO.is(file) : IO.is();
+            return file.canRead() ? IO.inputStream(file) : IO.inputStream();
         }
     };
 
     private static final $.Transformer<File, InputStream> GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
         @Override
         public InputStream transform(File file) {
-            return IO.is(file);
+            return IO.inputStream(file);
         }
     };
 
     private static final $.Visitor<File> DELETE_FILE = new $.Visitor<File>() {
         @Override
-        public void visit(File file) throws Osgl.Break {
+        public void visit(File file) throws $.Break {
             IO.delete(file);
         }
     };
@@ -196,8 +195,8 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     private static $.Visitor<File> writeBlob(final ISObject sobj) {
         return new $.Visitor<File>() {
             @Override
-            public void visit(File file) throws Osgl.Break {
-                OutputStream os = new BufferedOutputStream(IO.os(file));
+            public void visit(File file) throws $.Break {
+                OutputStream os = new BufferedOutputStream(IO.outputStream(file));
                 IO.write(IO.buffered(sobj.asInputStream()), os);
             }
         };
@@ -206,9 +205,9 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
     private static $.Visitor<File> writeAttributes(final Map<String, String> attrs) {
         return new $.Visitor<File>() {
             @Override
-            public void visit(File file) throws Osgl.Break {
+            public void visit(File file) throws $.Break {
                 if (null != attrs && !attrs.isEmpty()) {
-                    OutputStream os = IO.buffered(IO.os(file));
+                    OutputStream os = IO.buffered(IO.outputStream(file));
                     Properties p = new Properties();
                     p.putAll(attrs);
                     try {

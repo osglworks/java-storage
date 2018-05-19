@@ -52,7 +52,7 @@ public class FileSystemServiceConfigurer extends StorageServiceConfigurerBase im
 
     @Override
     public IStorageService getStorageService() {
-        Map<String, String> conf = C.map(
+        Map<String, String> conf = C.Map(
                 FileSystemService.CONF_HOME_DIR, homeDir,
                 FileSystemService.CONF_HOME_URL, homeUrl);
         FileSystemService ss = new FileSystemService(conf);

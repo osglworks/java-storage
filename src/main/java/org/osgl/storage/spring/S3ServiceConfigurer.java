@@ -20,6 +20,8 @@ package org.osgl.storage.spring;
  * #L%
  */
 
+import static org.osgl.storage.impl.S3Service.*;
+
 import org.osgl.storage.IStorageService;
 import org.osgl.storage.KeyGenerator;
 import org.osgl.storage.impl.S3Service;
@@ -28,8 +30,6 @@ import org.osgl.util.E;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
-import static org.osgl.storage.impl.S3Service.*;
 
 @Component
 public class S3ServiceConfigurer extends StorageServiceConfigurerBase implements StorageServiceConfigurer {
@@ -77,7 +77,7 @@ public class S3ServiceConfigurer extends StorageServiceConfigurerBase implements
 
     @Override
     public IStorageService getStorageService() {
-        Map<String, String> conf = C.map(CONF_KEY_ID, awsKeyId,
+        Map<String, String> conf = C.Map(CONF_KEY_ID, awsKeyId,
                 CONF_KEY_SECRET, awsKeySecret,
                 CONF_DEF_STORAGE_CLASS, defStorageClass,
                 CONF_BUCKET, bucket,
