@@ -1,10 +1,12 @@
 *.class
-
+*.iml
 # Package Files #
 *.jar
 *.war
 *.ear
 target
 deploy
-*.iml
-.idea/
+.idea
+.settings
+.project
+.classpath

@@ -1,5 +1,9 @@
 # OSGL Storage CHANGE LOG 
 
+1.7.0 - 14/Jun/2018
+* update aws-java-sdk-s3 to 1.11.347
+* update to osgl-tool-1.15.1
+
 1.6.0 - 19/May/2018
 * update osgl-tool to 1.13.1
     - move SObject, ISObject and IStorageService to osgl-tool
