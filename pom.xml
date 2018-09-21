@@ -47,7 +47,7 @@
         <spring.version>3.2.18.RELEASE</spring.version>
         <aws-sdk.version>1.11.347</aws-sdk.version>
         <azure-storage.version>7.0.0</azure-storage.version>
-
+        <qiniu-java-sdk.version>[7.2.0, 7.2.99]</qiniu-java-sdk.version>
     </properties>
 
     <scm>
@@ -101,6 +101,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Kodo storage system -->
+        <dependency>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>${qiniu-java-sdk.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

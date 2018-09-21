@@ -12,4 +12,5 @@ A easy to use library that save/read binary to/from different storage services i
 * File system
 * AWS S3 bucket
 * Azure Blob service
+* 七牛云存储 Kodo service
 * ... (add your own)
