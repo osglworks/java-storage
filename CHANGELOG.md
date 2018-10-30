@@ -1,5 +1,8 @@
 # OSGL Storage CHANGE LOG 
 
+1.8.0 - 30/Oct/2018
+* update to osgl-tool-1.18.0
+
 1.7.0 - 14/Jun/2018
 * update aws-java-sdk-s3 to 1.11.347
 * update to osgl-tool-1.15.1
