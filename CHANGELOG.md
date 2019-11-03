@@ -1,5 +1,8 @@
 # OSGL Storage CHANGE LOG 
 
+1.10.0 - 03/Nov/2019
+* update to osgl-tool-1.21.0
+
 1.9.0 - 19/Apr/2019
 * update to osgl-tool-1.19.2
 
