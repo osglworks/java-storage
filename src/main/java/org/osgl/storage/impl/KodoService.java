@@ -32,6 +32,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.osgl.$;
+import org.osgl.exception.AccessDeniedException;
+import org.osgl.exception.ResourceNotFoundException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.util.E;
@@ -107,7 +109,7 @@ public class KodoService extends StorageServiceBase<KodoObject> implements IStor
         try {
             bucketManager.delete(bucket, fullPath);
         } catch (QiniuException e) {
-            throw E.unexpected(e);
+            throw handleException(fullPath, e);
         }
     }
 
@@ -117,7 +119,7 @@ public class KodoService extends StorageServiceBase<KodoObject> implements IStor
             FileInfo stat = bucketManager.stat(bucket, fullPath);
             return $.copy(stat).to(Map.class);
         } catch (QiniuException e) {
-            throw E.unexpected(e);
+            throw handleException(fullPath, e);
         }
     }
 
@@ -134,7 +136,17 @@ public class KodoService extends StorageServiceBase<KodoObject> implements IStor
         Request req = new Request.Builder().url(baseUrl).build();
         try {
             Response resp = httpClient.newCall(req).execute();
-            return Objects.requireNonNull(resp.body()).byteStream();
+            if (resp.isSuccessful()) {
+                return Objects.requireNonNull(resp.body()).byteStream();
+            }
+            switch (resp.code()) {
+                case 404:
+                    throw new ResourceNotFoundException(fullPath);
+                case 403:
+                    throw new AccessDeniedException(fullPath);
+                default:
+                    throw E.unexpected("Error accessing %s: %s", fullPath, resp.body().string());
+            }
         } catch (IOException e) {
             throw E.ioException(e);
         }
@@ -161,7 +173,7 @@ public class KodoService extends StorageServiceBase<KodoObject> implements IStor
         try {
             uploadManager.put(stuff.asInputStream(), fullPath, getUploadToken(), meta, contentType);
         } catch (QiniuException e) {
-            throw E.unexpected(e);
+            throw handleException(fullPath, e);
         }
     }
 
@@ -173,5 +185,16 @@ public class KodoService extends StorageServiceBase<KodoObject> implements IStor
     @Override
     protected StorageServiceBase newService(Map<String, String> conf) {
         return new KodoService(conf);
+    }
+
+    private static RuntimeException handleException(String key, QiniuException e) {
+        switch (e.code()) {
+            case 404:
+                throw new ResourceNotFoundException(e, key);
+            case 403:
+                throw new AccessDeniedException(e, key);
+            default:
+                throw E.unexpected(key);
+        }
     }
 }

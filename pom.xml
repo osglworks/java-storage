@@ -20,7 +20,7 @@
 
     <artifactId>osgl-storage</artifactId>
     <packaging>jar</packaging>
-    <version>1.10.1-SNAPSHOT</version>
+    <version>1.11.0-SNAPSHOT</version>
 
     <name>Java Storage Service</name>
     <description>A simple storage service supports plugin varieties of implementations including Amazon S3</description>
@@ -42,7 +42,7 @@
         <scm.url>git@github.com:osglworks/java-storage.git</scm.url>
 
         <osgl-logging.version>1.5.0</osgl-logging.version>
-        <osgl-tool.version>1.21.0</osgl-tool.version>
+        <osgl-tool.version>1.24.0-SNAPSHOT</osgl-tool.version>
 
         <spring.version>3.2.18.RELEASE</spring.version>
         <aws-sdk.version>1.11.347</aws-sdk.version>

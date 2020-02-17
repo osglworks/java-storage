@@ -59,11 +59,6 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     public static final String CONF_STATIC_WEB_ENDPOINT = "storage.staticWebEndpoint";
 
     /**
-     * Whether it shall ignore the suffix in the key or not
-     */
-    public static final String CONF_STORE_SUFFIX = "storage.storeSuffix";
-
-    /**
      * User supplied {@link KeyNameProvider}
      */
     public static final String CONF_KEY_NAME_PROVIDER = "storage.keyNameProvider";
@@ -73,7 +68,6 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     private boolean staticWebEndpointIsAbsolute = false;
     private boolean loadMetaOnly = false;
     private boolean noGet = false;
-    private boolean storeSuffix = true;
     private KeyNameProvider keyNameProvider = KeyNameProvider.DEF_PROVIDER;
 
 
@@ -124,9 +118,6 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
 
         s = val(conf, CONF_GET_NO_GET, prefix);
         noGet = Boolean.parseBoolean(S.blank(s) ? "false" : s);
-
-        s = val(conf, CONF_STORE_SUFFIX, prefix);
-        storeSuffix = Boolean.parseBoolean(S.blank(s) ? "true" : s);
 
         s = val(conf, CONF_KEY_NAME_PROVIDER, prefix);
         if (S.notBlank(s)) {
@@ -285,18 +276,6 @@ public abstract class StorageServiceBase<SOBJ_TYPE extends SObject> implements I
     @Override
     public ISObject put(String key, ISObject stuff) {
         String processedKey = key;
-        if (storeSuffix) {
-            String originalFilename = stuff.getAttribute(ISObject.ATTR_FILE_NAME);
-            if (null != originalFilename) {
-                String suffix = S.afterLast(originalFilename, ".");
-                if (S.notBlank(suffix)) {
-                    suffix = S.concat(".", suffix);
-                    if (!key.endsWith(suffix)) {
-                        processedKey = S.concat(key, suffix);
-                    }
-                }
-            }
-        }
 
         if ((S.eq(key, stuff.getKey()) || S.eq(processedKey, stuff.getKey()) && isManagedObject(stuff))) {
             return stuff;

@@ -1,4 +1,8 @@
-# OSGL Storage CHANGE LOG 
+# OSGL Storage CHANGE LOG
+
+1.11.0
+* update to osgl-tool-1.24.0
+* Improve storage logic on handling resource not found and access denied exceptions #24 
 
 1.10.0 - 03/Nov/2019
 * update to osgl-tool-1.21.0

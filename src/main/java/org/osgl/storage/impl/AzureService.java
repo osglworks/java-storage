@@ -21,8 +21,11 @@ package org.osgl.storage.impl;
  */
 
 import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.*;
+import org.osgl.exception.AccessDeniedException;
 import org.osgl.exception.ConfigurationException;
+import org.osgl.exception.ResourceNotFoundException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
@@ -88,6 +91,8 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
             BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
             containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
             blobContainer.uploadPermissions(containerPermissions);
+        } catch (StorageException e) {
+            throw handleException("connect", e);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
             throw new ConfigurationException(exception);
@@ -99,8 +104,10 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
         try {
             CloudBlockBlob blob = blobContainer.getBlockBlobReference(fullPath);
             blob.deleteIfExists();
+        } catch (StorageException e) {
+            throw handleException(fullPath, e);
         } catch (Exception e) {
-            throw E.unexpected(e);
+            throw E.unexpected(e, fullPath);
         }
     }
 
@@ -126,8 +133,10 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
             Map<String, String> meta = C.newMap(blob.getMetadata());
             meta.put(ISObject.ATTR_CONTENT_TYPE, blob.getProperties().getContentType());
             return meta;
+        } catch (StorageException e) {
+            throw handleException(fullPath, e);
         } catch (Exception e) {
-            throw E.unexpected(e);
+            throw E.unexpected(e, fullPath);
         }
     }
 
@@ -153,6 +162,8 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
             blob.uploadProperties();
             blob.getMetadata().putAll(attrs);
             blob.uploadMetadata();
+        } catch (StorageException e) {
+            throw handleException(fullPath, e);
         } catch (Exception e) {
             throw E.unexpected(e);
         }
@@ -168,8 +179,21 @@ public class AzureService extends StorageServiceBase<AzureObject> implements ISt
         try {
             CloudBlockBlob blob = blobContainer.getBlockBlobReference(fullPath);
             return blob.openInputStream();
+        } catch (StorageException e) {
+            throw handleException(fullPath, e);
         } catch (Exception exception) {
             throw E.unexpected(exception);
+        }
+    }
+
+    private static RuntimeException handleException(String key, StorageException e) {
+        switch (e.getHttpStatusCode()) {
+            case 404:
+                throw new ResourceNotFoundException(e, key);
+            case 403:
+                throw new AccessDeniedException(e, key);
+            default:
+                throw E.unexpected(e, key);
         }
     }
 }

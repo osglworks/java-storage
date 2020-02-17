@@ -21,6 +21,8 @@ package org.osgl.storage.impl;
  */
 
 import org.osgl.$;
+import org.osgl.exception.AccessDeniedException;
+import org.osgl.exception.ResourceNotFoundException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.util.C;
@@ -90,18 +92,11 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
 
     @Override
     protected Map<String, String> doGetMeta(String fullPath) {
-        InputStream is = doOperate(fullPath, null, SAFE_GET_INPUT_STREAM);
-        if (null == is) {
+        File attrFile = getFile(fullPath + ".attr");
+        if (!attrFile.canRead()) {
             return C.newMap();
         }
-        Properties p = new Properties();
-        try {
-            p.load(is);
-        } catch (IOException e) {
-            throw E.ioException(e);
-        } finally {
-            IO.close(is);
-        }
+        Properties p = IO.loadProperties(attrFile);
         return $.cast(p);
     }
 
@@ -148,9 +143,9 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
         if (null != attrOperator) {
             File fAttr = new File(file.getParent(), file.getName() + ".attr");
             if (null != retVal) {
-                retVal = attrOperator.apply(fAttr);
-            } else {
                 attrOperator.apply(fAttr);
+            } else {
+                retVal = attrOperator.apply(fAttr);
             }
         }
         return retVal;
@@ -171,16 +166,15 @@ public class FileSystemService extends StorageServiceBase<FileObject> implements
         return new FileSystemService(conf);
     }
 
-    private static final $.Transformer<File, InputStream> SAFE_GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
-        @Override
-        public InputStream transform(File file) {
-            return file.canRead() ? IO.inputStream(file) : IO.inputStream();
-        }
-    };
-
     private static final $.Transformer<File, InputStream> GET_INPUT_STREAM = new $.Transformer<File, InputStream>() {
         @Override
         public InputStream transform(File file) {
+            if (!file.exists()) {
+                throw new ResourceNotFoundException(file);
+            }
+            if (!file.canRead()) {
+                throw new AccessDeniedException(file);
+            }
             return IO.inputStream(file);
         }
     };

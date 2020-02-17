@@ -62,8 +62,7 @@ public class StorageObject<TYPE extends StorageObject, SVC extends StorageServic
                 if (null == buf) {
                     buf = loadBuf();
                     if (!buf.isValid()) {
-                        this.valid = false;
-                        this.cause = buf.getException();
+                        this.setCause(buf.getException());
                     }
                 }
             }

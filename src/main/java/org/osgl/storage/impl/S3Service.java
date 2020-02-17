@@ -26,6 +26,8 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import org.osgl.exception.AccessDeniedException;
+import org.osgl.exception.ResourceNotFoundException;
 import org.osgl.storage.ISObject;
 import org.osgl.storage.IStorageService;
 import org.osgl.util.E;
@@ -157,12 +159,20 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
 
     @Override
     protected void doRemove(String fullPath) {
-        s3.deleteObject(new DeleteObjectRequest(bucket, fullPath));
+        try {
+            s3.deleteObject(new DeleteObjectRequest(bucket, fullPath));
+        } catch (AmazonS3Exception e) {
+            throw handleException(fullPath, e);
+        }
     }
 
     @Override
     protected ISObject newSObject(String key) {
-        return new S3Obj(key, this);
+        try {
+            return new S3Obj(key, this);
+        } catch (AmazonS3Exception e) {
+            throw handleException(key, e);
+        }
     }
 
     @Override
@@ -182,7 +192,8 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
     @Override
     protected void doPut(String fullPath, ISObject stuff, Map<String, String> attrs) {
         ObjectMetadata meta = new ObjectMetadata();
-        meta.setContentType(stuff.getAttribute(ISObject.ATTR_CONTENT_TYPE));
+        //meta.setContentType(stuff.getAttribute(ISObject.ATTR_CONTENT_TYPE));
+        meta.setUserMetadata(attrs);
         if (!(stuff instanceof SObject.InputStreamSObject)) {
             long length = stuff.getLength();
             if (0 < length) {
@@ -197,7 +208,11 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
             req.setStorageClass(storageClass.toString());
         }
         req.withCannedAcl(CannedAccessControlList.PublicRead);
-        s3.putObject(req);
+        try {
+            s3.putObject(req);
+        } catch (AmazonS3Exception e) {
+            throw handleException(fullPath, e);
+        }
     }
 
     private static ObjectTagging mapToTagList(Map<String, String> map) {
@@ -216,8 +231,21 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
         return map;
     }
 
+    private static AmazonS3Exception handleException(String key, AmazonS3Exception e) {
+        int status = e.getStatusCode();
+        switch (status) {
+            case 404:
+                throw new ResourceNotFoundException(e, key);
+            case 403:
+                throw new AccessDeniedException(e, key);
+            default:
+                throw e;
+        }
+    }
+
     @Override
     protected StorageServiceBase newService(Map conf) {
         return new S3Service(conf);
     }
+
 }
