@@ -44,7 +44,7 @@ import java.util.Map;
  */
 public class S3Service extends StorageServiceBase<S3Obj> implements IStorageService {
 
-    public static enum StorageClass {
+    public enum StorageClass {
         STANDARD, REDUCED_REDUNDANCY, GLACIER;
 
         public static StorageClass valueOfIgnoreCase(String s, StorageClass def) {
@@ -103,7 +103,7 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
 
     private String awsKeyId;
     private String awsKeySecret;
-    private StorageClass defStorageClass = StorageClass.REDUCED_REDUNDANCY;
+    private StorageClass defStorageClass;
     private String bucket;
 
     public static AmazonS3 s3;
@@ -123,6 +123,8 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
         String sc = conf.get(CONF_DEF_STORAGE_CLASS);
         if (null != sc) {
             defStorageClass = StorageClass.valueOfIgnoreCase(sc, defStorageClass);
+        } else {
+            defStorageClass = StorageClass.REDUCED_REDUNDANCY;
         }
         bucket = conf.get(CONF_BUCKET);
         if (null == bucket) {

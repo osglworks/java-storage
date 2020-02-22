@@ -1,6 +1,7 @@
 # OSGL Storage CHANGE LOG
 
 1.11.0
+* The `ss.storage.s3.defStorageClass` configuration is not effective #25
 * update to osgl-tool-1.24.0
 * Improve storage logic on handling resource not found and access denied exceptions #24 
 
