@@ -44,7 +44,7 @@
         <osgl-logging.version>1.5.0</osgl-logging.version>
         <osgl-tool.version>1.24.0</osgl-tool.version>
 
-        <spring.version>3.2.18.RELEASE</spring.version>
+        <spring.version>5.2.4.RELEASE</spring.version>
         <aws-sdk.version>1.11.734</aws-sdk.version>
         <azure-storage.version>7.0.0</azure-storage.version>
         <qiniu-java-sdk.version>7.2.17</qiniu-java-sdk.version>
