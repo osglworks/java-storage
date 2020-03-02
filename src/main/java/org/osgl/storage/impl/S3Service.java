@@ -220,7 +220,7 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
     private static ObjectTagging mapToTagList(Map<String, String> map) {
         List<Tag> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            list.add(new Tag(entry.getKey(), entry.getValue()));
+            list.add(new Tag(entry.getKey(), replaceSpecialCharacters(entry.getValue())));
         }
         return new ObjectTagging(list);
     }
@@ -250,4 +250,30 @@ public class S3Service extends StorageServiceBase<S3Obj> implements IStorageServ
         return new S3Service(conf);
     }
 
+    // refer: https://github.com/osglworks/java-storage/issues/26
+    private static String replaceSpecialCharacters(String s) {
+        boolean changed = false;
+        char[] ca = s.toCharArray();
+        for (int i = ca.length - 1; i >= 0; --i) {
+            char c = ca[i];
+            if (!isValid(c)) {
+                ca[i] = ' ';
+                changed = true;
+            }
+        }
+        return changed ? new String(ca) : s;
+    }
+
+    // refer: https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
+    private static boolean isValid(char c) {
+        if (c >= '0' && c <= '9') return true;
+        if (c >= 'a' && c <= 'z') return true;
+        if (c >= 'A' && c <= 'Z') return true;
+        switch (c) {
+            case '/':
+            case '.':
+                return true;
+        }
+        return false;
+    }
 }

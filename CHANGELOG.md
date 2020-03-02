@@ -1,5 +1,10 @@
 # OSGL Storage CHANGE LOG
 
+1.11.1 - 02/Mar/2020
+* Exception uploading file into S3 bucket #26
+* The `ss.storage.s3.defStorageClass` configuration is not effective #25
+* Improve storage logic on handling resource not found and access denied exceptions #24
+
 1.11.0
 * The `ss.storage.s3.defStorageClass` configuration is not effective #25
 * update to osgl-tool-1.24.0
