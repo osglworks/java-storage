@@ -1,5 +1,7 @@
 # OSGL Storage CHANGE LOG
 
+1.11.1 - 27/Jun/2020
+* Update to osgl-tool-1.25.0
 
 1.11.0 - 02/Mar/2020
 * Exception uploading file into S3 bucket #26
